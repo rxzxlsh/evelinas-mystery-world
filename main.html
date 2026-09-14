@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Detective Files — Case #001</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7ecdf;
+    --paper:#fffcf6;
+    --paper-2:#fdf6ea;
+    --ink:#4a3b52;
+    --ink-soft:#7a6b82;
+    --mauve:#c98ba6;
+    --mauve-dark:#a8688c;
+    --mint:#9fcbb0;
+    --mint-dark:#5f9a7c;
+    --coral:#e2725b;
+    --lavender:#cbb8e8;
+    --lavender-dark:#a487d4;
+    --tan:#e8d6a8;
+    --line:#e3d3b6;
+    --locked:#cabfc9;
+    --shadow-ink: rgba(74,59,82,0.18);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(74,59,82,0.06) 1px, transparent 0) 0 0/22px 22px,
+      var(--bg);
+    color:var(--ink);
+    font-family:'Quicksand', sans-serif;
+    font-weight:500;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+
+  h1,h2,h3,h4{
+    font-family:'Fredoka', sans-serif;
+    margin:0;
+    color:var(--ink);
+  }
+
+  .typewriter{
+    font-family:'Special Elite', monospace;
+  }
+
+  /* ===== Layout shell ===== */
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:26px 20px 0;
+  }
+
+  /* ===== Header / Case Folder Tab ===== */
+  .folder-header{
+    position:relative;
+    background:var(--tan);
+    border:3px solid var(--ink);
+    border-bottom:none;
+    border-radius:14px 14px 0 0;
+    padding:22px 26px 16px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .folder-header::before{
+    content:"";
+    position:absolute;
+    top:-22px; left:36px;
+    width:180px; height:26px;
+    background:var(--tan);
+    border:3px solid var(--ink);
+    border-bottom:none;
+    border-radius:10px 10px 0 0;
+  }
+  .header-left{position:relative; z-index:1;}
+  .kicker{
+    font-family:'Special Elite', monospace;
+    font-size:0.78rem;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .header-left h1{
+    font-size:clamp(1.6rem, 3.2vw, 2.5rem);
+    line-height:1.05;
+  }
+  .header-left h1 span{color:var(--coral);}
+  .stamp{
+    font-family:'Special Elite', monospace;
+    display:inline-block;
+    border:2.5px solid var(--coral);
+    color:var(--coral);
+    padding:3px 10px;
+    border-radius:4px;
+    transform:rotate(-4deg);
+    font-size:0.72rem;
+    letter-spacing:1.5px;
+    margin-top:8px;
+  }
+
+  .agent-box{
+    background:var(--paper);
+    border:2.5px solid var(--ink);
+    border-radius:10px;
+    padding:10px 16px;
+    min-width:200px;
+    box-shadow:4px 4px 0 var(--shadow-ink);
+  }
+  .agent-box label{
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:4px;
+  }
+  .agent-box input{
+    font-family:'Fredoka', sans-serif;
+    font-size:1rem;
+    font-weight:600;
+    border:none;
+    border-bottom:2px dashed var(--line);
+    background:transparent;
+    color:var(--ink);
+    width:100%;
+    padding:2px 0 4px;
+  }
+  .agent-box input:focus{outline:none; border-color:var(--mauve);}
+
+  /* ===== Body panel ===== */
+  .board{
+    background:var(--paper);
+    border:3px solid var(--ink);
+    border-radius:0 0 14px 14px;
+    padding:26px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:22px;
+  }
+  @media (max-width:820px){
+    .board{grid-template-columns:1fr;}
+  }
+
+  /* ===== Sidebar: leaderboard + trail ===== */
+  .sidebar{display:flex; flex-direction:column; gap:18px;}
+
+  .scoreboard{
+    background:var(--paper-2);
+    border:2.5px solid var(--ink);
+    border-radius:12px;
+    padding:16px 16px 12px;
+  }
+  .scoreboard h3{
+    font-size:1rem;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:10px;
+  }
+  .score-total{
+    font-family:'Fredoka';
+    font-size:2.1rem;
+    color:var(--mauve-dark);
+    line-height:1;
+    margin-bottom:2px;
+  }
+  .score-total small{
+    font-family:'Quicksand';
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .skill-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:0.82rem;
+    padding:5px 0;
+    border-top:1px dashed var(--line);
+  }
+  .skill-row:first-of-type{border-top:none; margin-top:8px;}
+  .stars{letter-spacing:1px; color:var(--mint-dark);}
+  .stars .dim{color:var(--line);}
+
+  .trail{
+    background:var(--paper-2);
+    border:2.5px solid var(--ink);
+    border-radius:12px;
+    padding:16px;
+    position:relative;
+  }
+  .trail h3{font-size:1rem; margin-bottom:12px;}
+  .trail-list{list-style:none; margin:0; padding:0; position:relative;}
+  .trail-list::before{
+    content:"";
+    position:absolute;
+    left:15px; top:6px; bottom:6px;
+    width:2px;
+    background-image:linear-gradient(var(--coral) 60%, transparent 0);
+    background-size:2px 8px;
+    background-repeat:repeat-y;
+    opacity:0.55;
+  }
+  .trail-item{
+    position:relative;
+    padding:8px 0 8px 40px;
+    cursor:pointer;
+    border-radius:8px;
+  }
+  .trail-item:hover{background:rgba(201,139,166,0.12);}
+  .trail-item .pin{
+    position:absolute;
+    left:2px; top:7px;
+    width:26px; height:26px;
+    border-radius:50%;
+    border:2.5px solid var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.75rem;
+    background:var(--paper);
+    z-index:1;
+  }
+  .trail-item.done .pin{background:var(--mint); border-color:var(--mint-dark);}
+  .trail-item.active .pin{background:var(--coral); border-color:var(--ink); color:#fff;}
+  .trail-item.locked{cursor:not-allowed; opacity:0.55;}
+  .trail-item.locked .pin{background:var(--locked);}
+  .trail-item .label{
+    font-size:0.82rem;
+    font-weight:600;
+    line-height:1.15;
+  }
+  .trail-item.active .label{color:var(--coral);}
+
+  /* ===== Main content ===== */
+  .stage{
+    background:var(--paper-2);
+    border:2.5px solid var(--ink);
+    border-radius:12px;
+    padding:26px;
+    min-height:420px;
+    position:relative;
+    overflow:hidden;
+  }
+  .stage::before{
+    content:"";
+    position:absolute;
+    top:14px; right:14px;
+    width:46px;height:46px;
+    background:var(--lavender);
+    border:2.5px solid var(--ink);
+    border-radius:50%;
+    opacity:0.9;
+  }
+  .stage-eyebrow{
+    font-family:'Special Elite', monospace;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .stage h2{
+    font-size:1.5rem;
+    margin-bottom:6px;
+    max-width:80%;
+  }
+  .stage-sub{
+    color:var(--ink-soft);
+    font-size:0.92rem;
+    margin-bottom:18px;
+    max-width:80%;
+  }
+
+  .clue-tag{
+    display:inline-block;
+    font-family:'Special Elite', monospace;
+    font-size:0.7rem;
+    background:var(--coral);
+    color:#fff;
+    padding:2px 8px;
+    border-radius:4px;
+    margin-right:6px;
+    transform:rotate(-2deg);
+  }
+
+  .card{
+    background:var(--paper);
+    border:2px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .card.story p{
+    font-family:'Special Elite', monospace;
+    font-size:0.88rem;
+    line-height:1.75;
+    margin:0 0 12px;
+  }
+  .card.story p:last-child{margin-bottom:0;}
+
+  .q-block{margin-bottom:20px;}
+  .q-block:last-child{margin-bottom:0;}
+  .q-prompt{font-weight:700; margin-bottom:10px; font-size:0.98rem;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    text-align:left;
+    background:var(--paper);
+    border:2px solid var(--ink);
+    border-radius:8px;
+    padding:9px 14px;
+    font-family:'Quicksand';
+    font-weight:600;
+    font-size:0.9rem;
+    color:var(--ink);
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--shadow-ink);
+    transition:transform .08s ease;
+  }
+  .opt:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--shadow-ink);}
+  .opt.correct{background:var(--mint); border-color:var(--mint-dark);}
+  .opt.wrong{background:#f3c9c0; border-color:var(--coral);}
+  .opt:disabled{cursor:default;}
+  .feedback{
+    margin-top:8px;
+    font-size:0.85rem;
+    padding:8px 12px;
+    border-radius:8px;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.good{background:rgba(159,203,176,0.35); color:var(--mint-dark);}
+  .feedback.bad{background:rgba(226,114,91,0.18); color:var(--coral);}
+
+  textarea{
+    width:100%;
+    min-height:110px;
+    font-family:'Quicksand';
+    font-size:0.92rem;
+    color:var(--ink);
+    border:2px solid var(--ink);
+    border-radius:8px;
+    padding:12px;
+    resize:vertical;
+    background:var(--paper);
+  }
+  textarea:focus{outline:none; border-color:var(--mauve);}
+
+  .reveal-btn, .btn{
+    font-family:'Fredoka';
+    font-weight:600;
+    font-size:0.88rem;
+    border:2.5px solid var(--ink);
+    background:var(--lavender);
+    color:var(--ink);
+    padding:9px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--shadow-ink);
+    margin-top:6px;
+  }
+  .reveal-btn:hover, .btn:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--shadow-ink);}
+  .btn.primary{background:var(--coral); color:#fff;}
+  .btn.mint{background:var(--mint);}
+  .btn:disabled{opacity:0.45; cursor:not-allowed; box-shadow:none; transform:none;}
+
+  .sample-answer{
+    display:none;
+    margin-top:10px;
+    background:var(--paper-2);
+    border-left:4px solid var(--mauve);
+    padding:10px 14px;
+    font-size:0.86rem;
+    border-radius:0 8px 8px 0;
+  }
+  .sample-answer.show{display:block;}
+
+  .paper-note{
+    background:var(--tan);
+    border:2px dashed var(--ink);
+    border-radius:10px;
+    padding:14px 16px;
+    font-size:0.85rem;
+    margin-bottom:16px;
+  }
+  .paper-note b{font-family:'Fredoka';}
+
+  .checkline{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    font-size:0.92rem;
+    margin-top:10px;
+  }
+  .checkline input{width:20px; height:20px; accent-color:var(--mauve-dark);}
+
+  .stage-footer{
+    margin-top:22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .stage-footer .status{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+
+  .word-parts{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin:10px 0;
+  }
+  .word-parts span{
+    font-family:'Special Elite';
+    background:var(--paper-2);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:4px 9px;
+    font-size:0.85rem;
+  }
+
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media(max-width:600px){.grid-2{grid-template-columns:1fr;}}
+
+  .suspect-card{
+    border:2px solid var(--ink);
+    border-radius:10px;
+    padding:12px 14px;
+    background:var(--paper);
+  }
+  .suspect-card h4{font-size:0.95rem; margin-bottom:4px;}
+  .suspect-card p{font-size:0.82rem; color:var(--ink-soft); margin:0 0 8px;}
+  select{
+    width:100%;
+    font-family:'Quicksand';
+    font-weight:700;
+    font-size:0.85rem;
+    padding:6px 8px;
+    border:2px solid var(--ink);
+    border-radius:6px;
+    background:var(--paper);
+    color:var(--ink);
+  }
+
+  /* ===== Case closed panel ===== */
+  .closed-banner{
+    text-align:center;
+    padding:30px 20px;
+  }
+  .closed-banner .stamp-big{
+    display:inline-block;
+    font-family:'Special Elite';
+    font-size:1.6rem;
+    border:4px solid var(--coral);
+    color:var(--coral);
+    padding:10px 26px;
+    border-radius:8px;
+    transform:rotate(-4deg);
+    margin-bottom:16px;
+  }
+
+  footer.tag{
+    text-align:center;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    margin-top:18px;
+    font-family:'Special Elite';
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="folder-header">
+    <div class="header-left">
+      <div class="kicker">🔎 CONFIDENTIAL — DETECTIVE FILES DIVISION</div>
+      <h1>Case #001: The <span>Missing Trophy</span></h1>
+      <div class="stamp">OPEN CASE</div>
+    </div>
+    <div class="agent-box">
+      <label>Lead Detective</label>
+      <input id="agentName" type="text" placeholder="Type your name..." />
+    </div>
+  </div>
+
+  <div class="board">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="scoreboard">
+        <h3>⭐ Detective Score</h3>
+        <div class="score-total" id="totalStars">0 <small>/ 24 stars</small></div>
+        <div id="skillRows"></div>
+      </div>
+
+      <div class="trail">
+        <h3>🗺️ Case Trail</h3>
+        <ul class="trail-list" id="trailList"></ul>
+      </div>
+    </div>
+
+    <!-- MAIN STAGE -->
+    <div class="stage" id="stage"></div>
+  </div>
+
+  <footer class="tag">— every clue earns a star. no guessing, only proving. —</footer>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const STATIONS = [
+  {id:0, key:"briefing", label:"The Briefing", icon:"📋", skill:"Focus", maxStars:2},
+  {id:1, key:"warmup",   label:"Evidence Warm-Up", icon:"🔍", skill:"Evidence", maxStars:4},
+  {id:2, key:"story",    label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2},
+  {id:3, key:"board",    label:"The Evidence Board", icon:"🧩", skill:"Evidence", maxStars:4},
+  {id:4, key:"vocab",    label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4},
+  {id:5, key:"note",     label:"The Secret Note (paper)", icon:"✏️", skill:"Spelling", maxStars:2},
+  {id:6, key:"interro",  label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:4},
+  {id:7, key:"report",   label:"Final Detective Report", icon:"🚨", skill:"Writing", maxStars:2},
+  {id:8, key:"closed",   label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0}
+];
+
+const SKILL_ORDER = ["Focus","Evidence","Reading","Vocabulary","Spelling","Writing"];
+const SKILL_MAX = {};
+STATIONS.forEach(s=>{ if(s.maxStars>0) SKILL_MAX[s.skill]=(SKILL_MAX[s.skill]||0)+s.maxStars; });
+
+/* ============ STATE ============ */
+const STORE_KEY = "detectiveCase001_progress_v1";
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { current:0, completed:{}, stars:{}, agent:"", answers:{} };
+}
+function saveState(){
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+
+function totalStars(){
+  return Object.values(state.stars).reduce((a,b)=>a+b,0);
+}
+function maxTotalStars(){
+  return STATIONS.reduce((a,s)=>a+s.maxStars,0);
+}
+function skillStars(skill){
+  let sum=0;
+  STATIONS.forEach(s=>{ if(s.skill===skill) sum += (state.stars[s.id]||0); });
+  return sum;
+}
+function isUnlocked(id){
+  if(id===0) return true;
+  return !!state.completed[id-1];
+}
+function awardStars(stationId, n){
+  const st = STATIONS.find(s=>s.id===stationId);
+  state.stars[stationId] = Math.min(n, st.maxStars);
+}
+function markComplete(id){
+  state.completed[id] = true;
+  saveState();
+  renderSidebar();
+}
+
+/* ============ NAME ============ */
+const agentInput = document.getElementById("agentName");
+agentInput.value = state.agent || "";
+agentInput.addEventListener("input", ()=>{
+  state.agent = agentInput.value;
+  saveState();
+});
+
+/* ============ SIDEBAR ============ */
+function renderSidebar(){
+  document.getElementById("totalStars").innerHTML =
+    totalStars() + ` <small>/ ${maxTotalStars()} stars</small>`;
+
+  const skillRows = document.getElementById("skillRows");
+  skillRows.innerHTML = "";
+  SKILL_ORDER.forEach(skill=>{
+    const max = SKILL_MAX[skill]||0;
+    const got = skillStars(skill);
+    const row = document.createElement("div");
+    row.className = "skill-row";
+    let starsHtml = "";
+    for(let i=0;i<max;i++){
+      starsHtml += i < got ? "★" : `<span class="dim">★</span>`;
+    }
+    row.innerHTML = `<span>${skill}</span><span class="stars">${starsHtml}</span>`;
+    skillRows.appendChild(row);
+  });
+
+  const trailList = document.getElementById("trailList");
+  trailList.innerHTML = "";
+  STATIONS.forEach(s=>{
+    const li = document.createElement("li");
+    const done = !!state.completed[s.id];
+    const unlocked = isUnlocked(s.id);
+    const active = state.current === s.id;
+    li.className = "trail-item" + (done?" done":"") + (active?" active":"") + (!unlocked?" locked":"");
+    li.innerHTML = `<span class="pin">${done?"✓":(unlocked?s.icon:"🔒")}</span><span class="label">${s.label}</span>`;
+    if(unlocked){
+      li.addEventListener("click", ()=>{ state.current = s.id; saveState(); render(); });
+    }
+    trailList.appendChild(li);
+  });
+}
+
+/* ============ STAGE RENDERERS ============ */
+function renderStage(){
+  const stage = document.getElementById("stage");
+  const s = STATIONS.find(st=>st.id===state.current);
+  stage.innerHTML = "";
+
+  if(!isUnlocked(s.id)){
+    stage.innerHTML = `<div class="stage-eyebrow">LOCKED FILE</div><h2>🔒 Not yet, detective.</h2><p class="stage-sub">Finish the previous case file first — every clue builds on the last one.</p>`;
+    return;
+  }
+
+  const renderers = {
+    briefing: renderBriefing,
+    warmup: renderWarmup,
+    story: renderStory,
+    board: renderBoard,
+    vocab: renderVocab,
+    note: renderNote,
+    interro: renderInterro,
+    report: renderReport,
+    closed: renderClosed
+  };
+  renderers[s.key](stage, s);
+}
+
+function stageHeader(stage, s, eyebrow, title, sub){
+  const h = document.createElement("div");
+  h.innerHTML = `<div class="stage-eyebrow">${eyebrow}</div><h2>${title}</h2><p class="stage-sub">${sub}</p>`;
+  stage.appendChild(h);
+}
+
+function footer(stage, s, nextEnabledCheck){
+  const f = document.createElement("div");
+  f.className = "stage-footer";
+  const done = !!state.completed[s.id];
+  f.innerHTML = `<span class="status">${done ? "✓ Filed away" : "Not filed yet"}</span>`;
+  const btn = document.createElement("button");
+  btn.className = "btn primary";
+  const isLast = s.id === STATIONS.length-2; // before closed
+  btn.textContent = done ? "Continue" : (isLast ? "File Final Report →" : "Mark Solved & Continue →");
+  btn.addEventListener("click", ()=>{
+    if(!done){
+      markComplete(s.id);
+    }
+    const nextId = s.id+1;
+    if(nextId < STATIONS.length){
+      state.current = nextId;
+      saveState();
+      render();
+    }
+  });
+  f.appendChild(btn);
+  stage.appendChild(f);
+}
+
+/* ---- 0: Briefing ---- */
+function renderBriefing(stage, s){
+  stageHeader(stage, s, "FILE 001 · BRIEFING", "📋 The Briefing", "Before you open the case, read the detective's rules.");
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <p><span class="clue-tag">RULE 1</span> When we're working, we're working.</p>
+    <p><span class="clue-tag">RULE 2</span> "I don't know" is a totally fine thing to say.</p>
+    <p><span class="clue-tag">RULE 3</span> You don't get points for guessing — you get points for <b>proving</b>.</p>
+    <p style="margin-top:10px; color:var(--ink-soft); font-size:0.85rem;">Someone has taken something from the school trophy cabinet. Your job is to figure out what really happened — using evidence, not guesses.</p>
+  `;
+  stage.appendChild(card);
+  awardStars(0,2);
+  footer(stage, s);
+}
+
+/* ---- 1: Warm-up quiz ---- */
+const WARMUP_Q = [
+  {q:"The classroom door was open.", opts:["Fact","Inference"], correct:0, why:"This is stated directly — nothing to figure out."},
+  {q:"Someone probably left the classroom recently.", opts:["Fact","Inference"], correct:1, why:"We're combining a clue (open door) with our own thinking."},
+  {q:"There was a blue backpack beside the desk.", opts:["Fact","Inference"], correct:0, why:"Directly observed — a fact."},
+  {q:"The person who left was probably a student.", opts:["Fact","Inference"], correct:1, why:"We can't know this for sure — it's a reasonable inference."}
+];
+function renderWarmup(stage, s){
+  stageHeader(stage, s, "FILE 001 · WARM-UP", "🔍 Evidence vs. Inference", "Evidence is something the text tells us directly. An inference is something we figure out. Sort each clue below.");
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<p style="font-family:'Special Elite'; font-size:0.85rem;">"Maya walked into the kitchen. The window was open, her umbrella was dripping on the floor, and there were muddy footprints beside the door."</p>`;
+  stage.appendChild(card);
+
+  let correctCount = 0;
+  const wrapper = document.createElement("div");
+  WARMUP_Q.forEach((item, idx)=>{
+    const block = document.createElement("div");
+    block.className = "q-block";
+    block.innerHTML = `<div class="q-prompt">${idx+1}. ${item.q}</div>`;
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    item.opts.forEach((label, oi)=>{
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.textContent = label;
+      b.addEventListener("click", ()=>{
+        [...opts.children].forEach(c=>c.disabled=true);
+        if(oi===item.correct){
+          b.classList.add("correct");
+          correctCount++;
+        } else {
+          b.classList.add("wrong");
+          opts.children[item.correct].classList.add("correct");
+        }
+        fb.classList.add("show", oi===item.correct?"good":"bad");
+        fb.textContent = item.why;
+        awardStars(1, correctCount);
+        renderSidebar();
+      });
+      opts.appendChild(b);
+    });
+    block.appendChild(opts);
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+    block.appendChild(fb);
+    wrapper.appendChild(block);
+  });
+  stage.appendChild(wrapper);
+  footer(stage, s);
+}
+
+/* ---- 2: Story ---- */
+const STORY_PARAGRAPHS = [
+  "It was Monday morning when Ms. Patel noticed something unusual.",
+  "The glass trophy cabinet near the front office was supposed to contain six trophies from the school's annual competitions. Five trophies were sitting exactly where they belonged. The sixth was missing — the Greenwood Science Challenge Trophy, a silver cup the school had won three years in a row.",
+  "Ms. Patel immediately checked the cabinet. There was no broken glass, and the lock did not appear damaged. \"Interesting,\" she said.",
+  "She called three students who had been near the office that morning: Evan, Sophie, and Marcus.",
+  "Evan arrived first. \"I was here around 8:05,\" he explained. \"I was dropping off my science project because I didn't want it to get damaged on the bus.\" He was carrying a large cardboard box — inside was, in fact, a volcano.",
+  "Next came Sophie. \"I came to the office at about 8:15. I needed to hand in a permission form.\" \"Did you see the trophy?\" \"No. But I remember seeing the cabinet.\"",
+  "Marcus arrived last. \"I wasn't near the office this morning. I was in the library.\" Then the school librarian, Mr. Chen, walked in. \"I actually saw Marcus this morning — he came into the library at 8:10.\" Marcus looked relieved.",
+  "But Ms. Patel wasn't finished. She examined the floor near the trophy cabinet and found several tiny drops of green paint. She looked at Evan's cardboard box — there was green paint on the side, too. Evan immediately looked nervous.",
+  "\"Wait!\" he said. \"That doesn't mean I took the trophy!\" Ms. Patel examined the paint more closely. \"You're right. It doesn't.\" Then she noticed something else: the green paint was still wet.",
+  "\"Where did you paint your volcano?\" she asked. \"In the art room.\" \"When?\" \"Yesterday afternoon.\" Ms. Patel smiled. \"Then your paint shouldn't still be wet.\" Evan's face went pale. Ms. Patel walked toward the art room. The case wasn't over yet."
+];
+function renderStory(stage, s){
+  stageHeader(stage, s, "FILE 001 · THE CASE", "📖 The Missing Trophy", "Read carefully — every detail could be a clue.");
+  const card = document.createElement("div");
+  card.className = "card story";
+  card.innerHTML = STORY_PARAGRAPHS.map(p=>`<p>${p}</p>`).join("");
+  stage.appendChild(card);
+  awardStars(2,2);
+  footer(stage, s);
+}
+
+/* ---- 3: Evidence Board ---- */
+const SUSPECTS = [
+  {name:"Evan", info:"Near the cabinet around 8:05. Cardboard box with green paint — still wet."},
+  {name:"Sophie", info:"Near the office at 8:15. Saw the cabinet but nothing else."},
+  {name:"Marcus", info:"In the library at 8:10 — confirmed by Mr. Chen."}
+];
+function renderBoard(stage, s){
+  stageHeader(stage, s, "FILE 001 · EVIDENCE BOARD", "🧩 The Evidence Board", "For each suspect, decide: does the evidence make them Suspicious, or are they Cleared?");
+  const grid = document.createElement("div");
+  grid.className = "grid-2";
+  let filled = 0;
+  SUSPECTS.forEach((sus, i)=>{
+    const card = document.createElement("div");
+    card.className = "suspect-card";
+    card.innerHTML = `<h4>${sus.name}</h4><p>${sus.info}</p>
+      <select id="sel-${i}">
+        <option value="">— choose —</option>
+        <option value="Suspicious">🟡 Suspicious</option>
+        <option value="Cleared">🟢 Cleared</option>
+      </select>`;
+    grid.appendChild(card);
+  });
+  stage.appendChild(grid);
+
+  const q = document.createElement("div");
+  q.className = "card";
+  q.style.marginTop = "16px";
+  q.innerHTML = `
+    <div class="q-prompt">Does the green paint prove Evan stole the trophy?</div>
+    <div class="opts" id="paintOpts">
+      <button class="opt">Yes, it proves it</button>
+      <button class="opt">No — it makes him suspicious, but it doesn't prove it</button>
+    </div>
+    <div class="feedback" id="paintFb"></div>
+  `;
+  stage.appendChild(q);
+
+  const opts = q.querySelector("#paintOpts");
+  const fb = q.querySelector("#paintFb");
+  [...opts.children].forEach((b, oi)=>{
+    b.addEventListener("click", ()=>{
+      [...opts.children].forEach(c=>c.disabled=true);
+      if(oi===1){ b.classList.add("correct"); }
+      else { b.classList.add("wrong"); opts.children[1].classList.add("correct"); }
+      fb.classList.add("show", oi===1?"good":"bad");
+      fb.textContent = "Right — a good detective knows the difference between suspicious and proven. We need more evidence before we can be sure.";
+      checkBoardStars();
+    });
+  });
+
+  [0,1,2].forEach(i=>{
+    document.getElementById(`sel-${i}`).addEventListener("change", checkBoardStars);
+  });
+
+  function checkBoardStars(){
+    let n = 0;
+    [0,1,2].forEach(i=>{ if(document.getElementById(`sel-${i}`).value) n++; });
+    const paintAnswered = opts.children[0].disabled;
+    let stars = 0;
+    if(n>=3) stars += 3;
+    else if(n>0) stars += 1;
+    if(paintAnswered) stars += 1;
+    awardStars(3, stars);
+    renderSidebar();
+  }
+
+  footer(stage, s);
+}
+
+/* ---- 4: Vocabulary ---- */
+const VOCAB_Q = [
+  {word:"unusual", sentence:'"Ms. Patel noticed something unusual."', opts:["Ordinary","Strange or uncommon","Enormous","Dangerous"], correct:1},
+  {word:"immediately", sentence:'"Ms. Patel immediately checked the cabinet."', opts:["Later that day","Slowly","Right away","Never"], correct:2},
+  {word:"examined", sentence:'"Ms. Patel examined the floor."', opts:["Ignored","Looked at carefully","Cleaned","Painted"], correct:1},
+  {word:"suspicious", sentence:'"Evan immediately looked nervous and suspicious."', opts:["Calm and relaxed","Making people think something is wrong","Very happy","Extremely tired"], correct:1}
+];
+function renderVocab(stage, s){
+  stageHeader(stage, s, "FILE 001 · VOCABULARY", "🔤 Vocabulary Detective", "Use context clues from the sentence to figure out what each word means.");
+
+  let correctCount = 0;
+  VOCAB_Q.forEach((item, idx)=>{
+    const block = document.createElement("div");
+    block.className = "q-block card";
+    block.innerHTML = `<div class="q-prompt">${idx+1}. ${item.word} — ${item.sentence}</div>`;
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    item.opts.forEach((label, oi)=>{
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.textContent = label;
+      b.addEventListener("click", ()=>{
+        [...opts.children].forEach(c=>c.disabled=true);
+        if(oi===item.correct){ b.classList.add("correct"); correctCount++; }
+        else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+        awardStars(4, correctCount);
+        renderSidebar();
+      });
+      opts.appendChild(b);
+    });
+    block.appendChild(opts);
+    stage.appendChild(block);
+  });
+
+  const morph = document.createElement("div");
+  morph.className = "card";
+  morph.innerHTML = `
+    <div class="q-prompt">🧬 Word Detective: what's the base word in "unusual"?</div>
+    <div class="word-parts"><span>un-</span><span>usual</span><span>= unusual</span></div>
+    <p style="font-size:0.85rem; color:var(--ink-soft);">"un-" flips a word to mean the opposite. Try it yourself: what happens when you add "-ness" to "nervous"?</p>
+    <div class="word-parts"><span>nervous</span><span>+ -ness</span><span>= nervousness</span></div>
+  `;
+  stage.appendChild(morph);
+
+  footer(stage, s);
+}
+
+/* ---- 5: Secret Note (paper task) ---- */
+function renderNote(stage, s){
+  stageHeader(stage, s, "FILE 001 · PAPER EVIDENCE", "✏️ The Secret Note", "This part happens on paper with your tutor — grab a pencil!");
+  const note = document.createElement("div");
+  note.className = "paper-note";
+  note.innerHTML = `
+    <b>📝 Messy note found at the scene:</b><br><br>
+    <i>"i saw evan near the trophy cabinet but he wasnt alone"</i><br><br>
+    Rewrite it correctly on paper — fix the capital letter, the comma, and the apostrophe.
+    Then write these three words neatly, twice each: <b>evidence · suspicious · examined</b>.
+  `;
+  stage.appendChild(note);
+
+  const check = document.createElement("label");
+  check.className = "checkline";
+  check.innerHTML = `<input type="checkbox" id="noteCheck"> I finished the secret note on paper with my tutor`;
+  stage.appendChild(check);
+
+  const cb = check.querySelector("#noteCheck");
+  cb.checked = !!state.answers.noteDone;
+  cb.addEventListener("change", ()=>{
+    state.answers.noteDone = cb.checked;
+    awardStars(5, cb.checked ? 2 : 0);
+    saveState();
+    renderSidebar();
+  });
+  if(cb.checked) awardStars(5,2);
+
+  footer(stage, s);
+}
+
+/* ---- 6: Interrogation (comprehension) ---- */
+function renderInterro(stage, s){
+  stageHeader(stage, s, "FILE 001 · INTERROGATION", "🧠 The Interrogation", "Answer in your own words. Click \"Compare with case notes\" to check your thinking after you write.");
+
+  const questions = [
+    {q:"What was missing from the trophy cabinet?", sample:"The Greenwood Science Challenge Trophy."},
+    {q:"What two details made Evan seem suspicious?", sample:"He was near the trophy cabinet, and his box had green paint on it that was still wet."},
+    {q:"Why did Ms. Patel become suspicious when she learned the paint was still wet?", sample:"Because Evan said he painted his volcano yesterday afternoon — so the paint should have dried by Monday morning."},
+    {q:"Is Evan definitely the person who stole the trophy? Explain why or why not.", sample:"No — we can't say for certain. The evidence makes him suspicious, but the story never actually shows him taking the trophy. Suspicious isn't the same as proven."}
+  ];
+
+  let answeredCount = 0;
+  questions.forEach((item, idx)=>{
+    const block = document.createElement("div");
+    block.className = "card q-block";
+    const savedKey = "interro_"+idx;
+    block.innerHTML = `
+      <div class="q-prompt">${idx+1}. ${item.q}</div>
+      <textarea placeholder="Type your answer here...">${state.answers[savedKey]||""}</textarea>
+      <button class="reveal-btn">🔎 Compare with case notes</button>
+      <div class="sample-answer">${item.sample}</div>
+    `;
+    const ta = block.querySelector("textarea");
+    const btn = block.querySelector(".reveal-btn");
+    const sample = block.querySelector(".sample-answer");
+    if(ta.value.trim()) answeredCount++;
+    ta.addEventListener("input", ()=>{
+      state.answers[savedKey] = ta.value;
+      saveState();
+    });
+    btn.addEventListener("click", ()=>{
+      sample.classList.add("show");
+      if(!state.answers[savedKey+"_revealed"]){
+        state.answers[savedKey+"_revealed"] = true;
+        let n=0;
+        questions.forEach((_,i2)=>{ if(state.answers["interro_"+i2+"_revealed"]) n++; });
+        awardStars(6, n);
+        renderSidebar();
+        saveState();
+      }
+    });
+    stage.appendChild(block);
+  });
+
+  footer(stage, s);
+}
+
+/* ---- 7: Final Report ---- */
+function renderReport(stage, s){
+  stageHeader(stage, s, "FILE 001 · FINAL REPORT", "🚨 Final Detective Report", "Who do you think is responsible? Use at least two pieces of evidence to support your answer — 3 to 5 sentences.");
+
+  const template = document.createElement("div");
+  template.className = "card";
+  template.innerHTML = `<p style="font-size:0.85rem; color:var(--ink-soft);">Need a starting point? Try:<br>
+  <i>I think ______ is responsible because ______. One piece of evidence is ______. Another clue is ______. This makes me think ______.</i></p>`;
+  stage.appendChild(template);
+
+  const ta = document.createElement("textarea");
+  ta.placeholder = "Write your final detective report here...";
+  ta.value = state.answers.finalReport || "";
+  ta.style.minHeight = "150px";
+  ta.addEventListener("input", ()=>{
+    state.answers.finalReport = ta.value;
+    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+    awardStars(7, words >= 15 ? 2 : (words>0?1:0));
+    saveState();
+    renderSidebar();
+  });
+  stage.appendChild(ta);
+  if(ta.value){
+    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+    awardStars(7, words >= 15 ? 2 : 1);
+  }
+
+  footer(stage, s);
+}
+
+/* ---- 8: Case Closed ---- */
+function renderClosed(stage, s){
+  stage.innerHTML = "";
+  const banner = document.createElement("div");
+  banner.className = "closed-banner";
+  const name = state.agent ? state.agent : "Detective";
+  banner.innerHTML = `
+    <div class="stamp-big">CASE CLOSED</div>
+    <h2>Great work, ${name}!</h2>
+    <p class="stage-sub" style="max-width:520px; margin:10px auto 0;">
+      Actually... we don't have enough evidence to solve the case yet. That's on purpose — a real detective knows when to keep investigating.
+      Next lesson, Case #002 opens with new clues.
+    </p>
+  `;
+  stage.appendChild(banner);
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.style.maxWidth = "520px";
+  card.style.margin = "0 auto 16px";
+  card.innerHTML = `<div class="q-prompt">🏅 Achievement unlocked: Rookie Detective</div>
+    <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${totalStars()} / ${maxTotalStars()} stars</p>`;
+  stage.appendChild(card);
+
+  const reflect = document.createElement("div");
+  reflect.className = "card";
+  reflect.style.maxWidth = "520px";
+  reflect.style.margin = "0 auto";
+  reflect.innerHTML = `<div class="q-prompt">What was the hardest part today?</div>
+    <textarea placeholder="Type your reflection..."></textarea>`;
+  const rta = reflect.querySelector("textarea");
+  rta.value = state.answers.reflection || "";
+  rta.addEventListener("input", ()=>{
+    state.answers.reflection = rta.value;
+    saveState();
+  });
+  stage.appendChild(reflect);
+
+  if(!state.completed[8]){
+    markComplete(8);
+  }
+}
+
+/* ============ RENDER ALL ============ */
+function render(){
+  renderSidebar();
+  renderStage();
+}
+render();
+</script>
+</body>
+</html>
