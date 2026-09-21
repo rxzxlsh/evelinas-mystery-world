@@ -3,748 +3,311 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Detective Files — Case #001</title>
+<title>The Detective Files</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f7ecdf;
-    --paper:#fffcf6;
-    --paper-2:#fdf6ea;
-    --ink:#4a3b52;
-    --ink-soft:#7a6b82;
-    --mauve:#c98ba6;
-    --mauve-dark:#a8688c;
-    --mint:#9fcbb0;
-    --mint-dark:#5f9a7c;
-    --coral:#e2725b;
-    --lavender:#cbb8e8;
-    --lavender-dark:#a487d4;
-    --tan:#e8d6a8;
-    --line:#e3d3b6;
-    --locked:#cabfc9;
-    --shadow-ink: rgba(74,59,82,0.18);
+    --bg:#f7ecdf; --paper:#fffcf6; --paper-2:#fdf6ea; --ink:#4a3b52; --ink-soft:#7a6b82;
+    --mauve:#c98ba6; --mauve-dark:#a8688c; --mint:#9fcbb0; --mint-dark:#5f9a7c;
+    --coral:#e2725b; --lavender:#cbb8e8; --lavender-dark:#a487d4; --tan:#e8d6a8;
+    --line:#e3d3b6; --locked:#cabfc9; --shadow-ink: rgba(74,59,82,0.18);
   }
-
   *{box-sizing:border-box;}
-
   body{
     margin:0;
-    background:
-      radial-gradient(circle at 1px 1px, rgba(74,59,82,0.06) 1px, transparent 0) 0 0/22px 22px,
-      var(--bg);
-    color:var(--ink);
-    font-family:'Quicksand', sans-serif;
-    font-weight:500;
-    min-height:100vh;
-    padding-bottom:60px;
+    background:radial-gradient(circle at 1px 1px, rgba(74,59,82,0.06) 1px, transparent 0) 0 0/22px 22px, var(--bg);
+    color:var(--ink); font-family:'Quicksand', sans-serif; font-weight:500; min-height:100vh; padding-bottom:60px;
   }
+  h1,h2,h3,h4{font-family:'Fredoka', sans-serif; margin:0; color:var(--ink);}
+  .typewriter{font-family:'Special Elite', monospace;}
+  .wrap{max-width:1180px; margin:0 auto; padding:26px 20px 0;}
 
-  h1,h2,h3,h4{
-    font-family:'Fredoka', sans-serif;
-    margin:0;
-    color:var(--ink);
+  /* Case tabs */
+  .case-tabs{display:flex; gap:8px; margin-bottom:-3px; position:relative; z-index:2; flex-wrap:wrap;}
+  .case-tab{
+    font-family:'Fredoka'; font-weight:600; font-size:0.82rem;
+    background:var(--paper-2); border:3px solid var(--ink); border-bottom:none;
+    border-radius:10px 10px 0 0; padding:8px 16px 12px; cursor:pointer; color:var(--ink-soft);
   }
+  .case-tab.active{background:var(--tan); color:var(--ink);}
+  .case-tab .num{font-family:'Special Elite'; font-size:0.7rem; display:block; opacity:0.7;}
 
-  .typewriter{
-    font-family:'Special Elite', monospace;
-  }
-
-  /* ===== Layout shell ===== */
-  .wrap{
-    max-width:1180px;
-    margin:0 auto;
-    padding:26px 20px 0;
-  }
-
-  /* ===== Header / Case Folder Tab ===== */
   .folder-header{
-    position:relative;
-    background:var(--tan);
-    border:3px solid var(--ink);
-    border-bottom:none;
-    border-radius:14px 14px 0 0;
-    padding:22px 26px 16px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:20px;
-    flex-wrap:wrap;
-  }
-  .folder-header::before{
-    content:"";
-    position:absolute;
-    top:-22px; left:36px;
-    width:180px; height:26px;
-    background:var(--tan);
-    border:3px solid var(--ink);
-    border-bottom:none;
-    border-radius:10px 10px 0 0;
+    position:relative; background:var(--tan); border:3px solid var(--ink); border-bottom:none;
+    border-radius:0 14px 0 0; padding:22px 26px 16px; display:flex; align-items:flex-end;
+    justify-content:space-between; gap:20px; flex-wrap:wrap;
   }
   .header-left{position:relative; z-index:1;}
-  .kicker{
-    font-family:'Special Elite', monospace;
-    font-size:0.78rem;
-    letter-spacing:1px;
-    color:var(--ink-soft);
-    margin-bottom:4px;
-  }
-  .header-left h1{
-    font-size:clamp(1.6rem, 3.2vw, 2.5rem);
-    line-height:1.05;
-  }
+  .kicker{font-family:'Special Elite', monospace; font-size:0.78rem; letter-spacing:1px; color:var(--ink-soft); margin-bottom:4px;}
+  .header-left h1{font-size:clamp(1.5rem, 3vw, 2.3rem); line-height:1.08;}
   .header-left h1 span{color:var(--coral);}
   .stamp{
-    font-family:'Special Elite', monospace;
-    display:inline-block;
-    border:2.5px solid var(--coral);
-    color:var(--coral);
-    padding:3px 10px;
-    border-radius:4px;
-    transform:rotate(-4deg);
-    font-size:0.72rem;
-    letter-spacing:1.5px;
-    margin-top:8px;
+    font-family:'Special Elite', monospace; display:inline-block; border:2.5px solid var(--coral); color:var(--coral);
+    padding:3px 10px; border-radius:4px; transform:rotate(-4deg); font-size:0.72rem; letter-spacing:1.5px; margin-top:8px;
   }
-
   .agent-box{
-    background:var(--paper);
-    border:2.5px solid var(--ink);
-    border-radius:10px;
-    padding:10px 16px;
-    min-width:200px;
-    box-shadow:4px 4px 0 var(--shadow-ink);
+    background:var(--paper); border:2.5px solid var(--ink); border-radius:10px; padding:10px 16px;
+    min-width:200px; box-shadow:4px 4px 0 var(--shadow-ink);
   }
-  .agent-box label{
-    font-size:0.68rem;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    color:var(--ink-soft);
-    display:block;
-    margin-bottom:4px;
-  }
+  .agent-box label{font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); display:block; margin-bottom:4px;}
   .agent-box input{
-    font-family:'Fredoka', sans-serif;
-    font-size:1rem;
-    font-weight:600;
-    border:none;
-    border-bottom:2px dashed var(--line);
-    background:transparent;
-    color:var(--ink);
-    width:100%;
-    padding:2px 0 4px;
+    font-family:'Fredoka', sans-serif; font-size:1rem; font-weight:600; border:none; border-bottom:2px dashed var(--line);
+    background:transparent; color:var(--ink); width:100%; padding:2px 0 4px;
   }
   .agent-box input:focus{outline:none; border-color:var(--mauve);}
 
-  /* ===== Body panel ===== */
   .board{
-    background:var(--paper);
-    border:3px solid var(--ink);
-    border-radius:0 0 14px 14px;
-    padding:26px;
-    display:grid;
-    grid-template-columns:260px 1fr;
-    gap:22px;
+    background:var(--paper); border:3px solid var(--ink); border-radius:0 0 14px 14px; padding:26px;
+    display:grid; grid-template-columns:260px 1fr; gap:22px;
   }
-  @media (max-width:820px){
-    .board{grid-template-columns:1fr;}
-  }
+  @media (max-width:820px){.board{grid-template-columns:1fr;}}
 
-  /* ===== Sidebar: leaderboard + trail ===== */
   .sidebar{display:flex; flex-direction:column; gap:18px;}
-
-  .scoreboard{
-    background:var(--paper-2);
-    border:2.5px solid var(--ink);
-    border-radius:12px;
-    padding:16px 16px 12px;
-  }
-  .scoreboard h3{
-    font-size:1rem;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    margin-bottom:10px;
-  }
-  .score-total{
-    font-family:'Fredoka';
-    font-size:2.1rem;
-    color:var(--mauve-dark);
-    line-height:1;
-    margin-bottom:2px;
-  }
-  .score-total small{
-    font-family:'Quicksand';
-    font-size:0.85rem;
-    color:var(--ink-soft);
-    font-weight:600;
-  }
-  .skill-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    font-size:0.82rem;
-    padding:5px 0;
-    border-top:1px dashed var(--line);
-  }
+  .scoreboard{background:var(--paper-2); border:2.5px solid var(--ink); border-radius:12px; padding:16px 16px 12px;}
+  .scoreboard h3{font-size:1rem; display:flex; align-items:center; gap:6px; margin-bottom:10px;}
+  .score-total{font-family:'Fredoka'; font-size:2.1rem; color:var(--mauve-dark); line-height:1; margin-bottom:2px;}
+  .score-total small{font-family:'Quicksand'; font-size:0.85rem; color:var(--ink-soft); font-weight:600;}
+  .skill-row{display:flex; align-items:center; justify-content:space-between; font-size:0.82rem; padding:5px 0; border-top:1px dashed var(--line);}
   .skill-row:first-of-type{border-top:none; margin-top:8px;}
   .stars{letter-spacing:1px; color:var(--mint-dark);}
   .stars .dim{color:var(--line);}
 
-  .trail{
-    background:var(--paper-2);
-    border:2.5px solid var(--ink);
-    border-radius:12px;
-    padding:16px;
-    position:relative;
-  }
+  .trail{background:var(--paper-2); border:2.5px solid var(--ink); border-radius:12px; padding:16px; position:relative;}
   .trail h3{font-size:1rem; margin-bottom:12px;}
   .trail-list{list-style:none; margin:0; padding:0; position:relative;}
   .trail-list::before{
-    content:"";
-    position:absolute;
-    left:15px; top:6px; bottom:6px;
-    width:2px;
-    background-image:linear-gradient(var(--coral) 60%, transparent 0);
-    background-size:2px 8px;
-    background-repeat:repeat-y;
-    opacity:0.55;
+    content:""; position:absolute; left:15px; top:6px; bottom:6px; width:2px;
+    background-image:linear-gradient(var(--coral) 60%, transparent 0); background-size:2px 8px;
+    background-repeat:repeat-y; opacity:0.55;
   }
-  .trail-item{
-    position:relative;
-    padding:8px 0 8px 40px;
-    cursor:pointer;
-    border-radius:8px;
-  }
+  .trail-item{position:relative; padding:8px 0 8px 40px; cursor:pointer; border-radius:8px;}
   .trail-item:hover{background:rgba(201,139,166,0.12);}
   .trail-item .pin{
-    position:absolute;
-    left:2px; top:7px;
-    width:26px; height:26px;
-    border-radius:50%;
-    border:2.5px solid var(--ink);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:0.75rem;
-    background:var(--paper);
-    z-index:1;
+    position:absolute; left:2px; top:7px; width:26px; height:26px; border-radius:50%; border:2.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:0.75rem; background:var(--paper); z-index:1;
   }
   .trail-item.done .pin{background:var(--mint); border-color:var(--mint-dark);}
   .trail-item.active .pin{background:var(--coral); border-color:var(--ink); color:#fff;}
   .trail-item.locked{cursor:not-allowed; opacity:0.55;}
   .trail-item.locked .pin{background:var(--locked);}
-  .trail-item .label{
-    font-size:0.82rem;
-    font-weight:600;
-    line-height:1.15;
-  }
+  .trail-item .label{font-size:0.8rem; font-weight:600; line-height:1.15;}
   .trail-item.active .label{color:var(--coral);}
 
-  /* ===== Main content ===== */
   .stage{
-    background:var(--paper-2);
-    border:2.5px solid var(--ink);
-    border-radius:12px;
-    padding:26px;
-    min-height:420px;
-    position:relative;
-    overflow:hidden;
+    background:var(--paper-2); border:2.5px solid var(--ink); border-radius:12px; padding:26px;
+    min-height:420px; position:relative; overflow:hidden;
   }
   .stage::before{
-    content:"";
-    position:absolute;
-    top:14px; right:14px;
-    width:46px;height:46px;
-    background:var(--lavender);
-    border:2.5px solid var(--ink);
-    border-radius:50%;
-    opacity:0.9;
+    content:""; position:absolute; top:14px; right:14px; width:46px;height:46px; background:var(--lavender);
+    border:2.5px solid var(--ink); border-radius:50%; opacity:0.9;
   }
-  .stage-eyebrow{
-    font-family:'Special Elite', monospace;
-    font-size:0.75rem;
-    color:var(--ink-soft);
-    margin-bottom:4px;
-  }
-  .stage h2{
-    font-size:1.5rem;
-    margin-bottom:6px;
-    max-width:80%;
-  }
-  .stage-sub{
-    color:var(--ink-soft);
-    font-size:0.92rem;
-    margin-bottom:18px;
-    max-width:80%;
-  }
-
+  .stage-eyebrow{font-family:'Special Elite', monospace; font-size:0.75rem; color:var(--ink-soft); margin-bottom:4px;}
+  .stage h2{font-size:1.4rem; margin-bottom:6px; max-width:80%;}
+  .stage-sub{color:var(--ink-soft); font-size:0.9rem; margin-bottom:18px; max-width:82%;}
   .clue-tag{
-    display:inline-block;
-    font-family:'Special Elite', monospace;
-    font-size:0.7rem;
-    background:var(--coral);
-    color:#fff;
-    padding:2px 8px;
-    border-radius:4px;
-    margin-right:6px;
-    transform:rotate(-2deg);
+    display:inline-block; font-family:'Special Elite', monospace; font-size:0.7rem; background:var(--coral);
+    color:#fff; padding:2px 8px; border-radius:4px; margin-right:6px; transform:rotate(-2deg);
   }
-
-  .card{
-    background:var(--paper);
-    border:2px solid var(--line);
-    border-radius:10px;
-    padding:16px 18px;
-    margin-bottom:16px;
-  }
-  .card.story p{
-    font-family:'Special Elite', monospace;
-    font-size:0.88rem;
-    line-height:1.75;
-    margin:0 0 12px;
-  }
+  .card{background:var(--paper); border:2px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:16px;}
+  .card.story p{font-family:'Special Elite', monospace; font-size:0.86rem; line-height:1.75; margin:0 0 12px;}
   .card.story p:last-child{margin-bottom:0;}
+  .card.story p.letter{padding-left:16px; border-left:3px solid var(--mauve); font-style:italic;}
 
   .q-block{margin-bottom:20px;}
   .q-block:last-child{margin-bottom:0;}
-  .q-prompt{font-weight:700; margin-bottom:10px; font-size:0.98rem;}
+  .q-prompt{font-weight:700; margin-bottom:10px; font-size:0.95rem;}
   .opts{display:flex; flex-direction:column; gap:8px;}
   .opt{
-    text-align:left;
-    background:var(--paper);
-    border:2px solid var(--ink);
-    border-radius:8px;
-    padding:9px 14px;
-    font-family:'Quicksand';
-    font-weight:600;
-    font-size:0.9rem;
-    color:var(--ink);
-    cursor:pointer;
-    box-shadow:3px 3px 0 var(--shadow-ink);
-    transition:transform .08s ease;
+    text-align:left; background:var(--paper); border:2px solid var(--ink); border-radius:8px; padding:9px 14px;
+    font-family:'Quicksand'; font-weight:600; font-size:0.88rem; color:var(--ink); cursor:pointer;
+    box-shadow:3px 3px 0 var(--shadow-ink); transition:transform .08s ease;
   }
   .opt:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--shadow-ink);}
   .opt.correct{background:var(--mint); border-color:var(--mint-dark);}
   .opt.wrong{background:#f3c9c0; border-color:var(--coral);}
   .opt:disabled{cursor:default;}
-  .feedback{
-    margin-top:8px;
-    font-size:0.85rem;
-    padding:8px 12px;
-    border-radius:8px;
-    display:none;
-  }
+  .feedback{margin-top:8px; font-size:0.83rem; padding:8px 12px; border-radius:8px; display:none;}
   .feedback.show{display:block;}
   .feedback.good{background:rgba(159,203,176,0.35); color:var(--mint-dark);}
   .feedback.bad{background:rgba(226,114,91,0.18); color:var(--coral);}
 
   textarea{
-    width:100%;
-    min-height:110px;
-    font-family:'Quicksand';
-    font-size:0.92rem;
-    color:var(--ink);
-    border:2px solid var(--ink);
-    border-radius:8px;
-    padding:12px;
-    resize:vertical;
-    background:var(--paper);
+    width:100%; min-height:100px; font-family:'Quicksand'; font-size:0.9rem; color:var(--ink);
+    border:2px solid var(--ink); border-radius:8px; padding:12px; resize:vertical; background:var(--paper);
   }
   textarea:focus{outline:none; border-color:var(--mauve);}
+  input[type=text].line-input{
+    width:100%; font-family:'Quicksand'; font-weight:600; font-size:0.88rem; color:var(--ink);
+    border:none; border-bottom:2px dashed var(--line); background:transparent; padding:4px 2px;
+  }
+  input[type=text].line-input:focus{outline:none; border-color:var(--mauve);}
 
   .reveal-btn, .btn{
-    font-family:'Fredoka';
-    font-weight:600;
-    font-size:0.88rem;
-    border:2.5px solid var(--ink);
-    background:var(--lavender);
-    color:var(--ink);
-    padding:9px 18px;
-    border-radius:8px;
-    cursor:pointer;
-    box-shadow:3px 3px 0 var(--shadow-ink);
-    margin-top:6px;
+    font-family:'Fredoka'; font-weight:600; font-size:0.86rem; border:2.5px solid var(--ink); background:var(--lavender);
+    color:var(--ink); padding:9px 18px; border-radius:8px; cursor:pointer; box-shadow:3px 3px 0 var(--shadow-ink); margin-top:6px;
   }
   .reveal-btn:hover, .btn:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--shadow-ink);}
   .btn.primary{background:var(--coral); color:#fff;}
   .btn.mint{background:var(--mint);}
   .btn:disabled{opacity:0.45; cursor:not-allowed; box-shadow:none; transform:none;}
-
   .sample-answer{
-    display:none;
-    margin-top:10px;
-    background:var(--paper-2);
-    border-left:4px solid var(--mauve);
-    padding:10px 14px;
-    font-size:0.86rem;
-    border-radius:0 8px 8px 0;
+    display:none; margin-top:10px; background:var(--paper-2); border-left:4px solid var(--mauve);
+    padding:10px 14px; font-size:0.85rem; border-radius:0 8px 8px 0;
   }
   .sample-answer.show{display:block;}
-
-  .paper-note{
-    background:var(--tan);
-    border:2px dashed var(--ink);
-    border-radius:10px;
-    padding:14px 16px;
-    font-size:0.85rem;
-    margin-bottom:16px;
-  }
+  .paper-note{background:var(--tan); border:2px dashed var(--ink); border-radius:10px; padding:14px 16px; font-size:0.85rem; margin-bottom:16px;}
   .paper-note b{font-family:'Fredoka';}
-
-  .checkline{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-weight:700;
-    font-size:0.92rem;
-    margin-top:10px;
-  }
+  .checkline{display:flex; align-items:center; gap:10px; font-weight:700; font-size:0.9rem; margin-top:10px;}
   .checkline input{width:20px; height:20px; accent-color:var(--mauve-dark);}
-
-  .stage-footer{
-    margin-top:22px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:10px;
-  }
-  .stage-footer .status{
-    font-size:0.8rem;
-    color:var(--ink-soft);
-    font-style:italic;
-  }
-
-  .word-parts{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    margin:10px 0;
-  }
-  .word-parts span{
-    font-family:'Special Elite';
-    background:var(--paper-2);
-    border:2px solid var(--ink);
-    border-radius:6px;
-    padding:4px 9px;
-    font-size:0.85rem;
-  }
-
+  .stage-footer{margin-top:22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;}
+  .stage-footer .status{font-size:0.8rem; color:var(--ink-soft); font-style:italic;}
+  .word-parts{display:flex; gap:6px; flex-wrap:wrap; margin:10px 0;}
+  .word-parts span{font-family:'Special Elite'; background:var(--paper-2); border:2px solid var(--ink); border-radius:6px; padding:4px 9px; font-size:0.85rem;}
   .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
   @media(max-width:600px){.grid-2{grid-template-columns:1fr;}}
-
-  .suspect-card{
-    border:2px solid var(--ink);
-    border-radius:10px;
-    padding:12px 14px;
-    background:var(--paper);
-  }
+  .suspect-card{border:2px solid var(--ink); border-radius:10px; padding:12px 14px; background:var(--paper);}
   .suspect-card h4{font-size:0.95rem; margin-bottom:4px;}
   .suspect-card p{font-size:0.82rem; color:var(--ink-soft); margin:0 0 8px;}
   select{
-    width:100%;
-    font-family:'Quicksand';
-    font-weight:700;
-    font-size:0.85rem;
-    padding:6px 8px;
-    border:2px solid var(--ink);
-    border-radius:6px;
-    background:var(--paper);
-    color:var(--ink);
+    width:100%; font-family:'Quicksand'; font-weight:700; font-size:0.85rem; padding:6px 8px;
+    border:2px solid var(--ink); border-radius:6px; background:var(--paper); color:var(--ink);
   }
-
-  /* ===== Case closed panel ===== */
-  .closed-banner{
-    text-align:center;
-    padding:30px 20px;
-  }
+  table.log{width:100%; border-collapse:collapse; font-size:0.85rem;}
+  table.log th{font-family:'Fredoka'; text-align:left; font-size:0.78rem; color:var(--ink-soft); padding:6px 8px; border-bottom:2px solid var(--ink);}
+  table.log td{padding:8px; vertical-align:top; border-bottom:1px dashed var(--line);}
+  table.log td.ev{font-family:'Special Elite'; font-size:0.78rem; width:38%;}
+  .closed-banner{text-align:center; padding:26px 20px 6px;}
   .closed-banner .stamp-big{
-    display:inline-block;
-    font-family:'Special Elite';
-    font-size:1.6rem;
-    border:4px solid var(--coral);
-    color:var(--coral);
-    padding:10px 26px;
-    border-radius:8px;
-    transform:rotate(-4deg);
-    margin-bottom:16px;
+    display:inline-block; font-family:'Special Elite'; font-size:1.5rem; border:4px solid var(--coral); color:var(--coral);
+    padding:10px 26px; border-radius:8px; transform:rotate(-4deg); margin-bottom:16px;
   }
-
-  footer.tag{
-    text-align:center;
-    font-size:0.75rem;
-    color:var(--ink-soft);
-    margin-top:18px;
-    font-family:'Special Elite';
-  }
+  .journal-day{border:2px solid var(--line); border-radius:8px; padding:10px 14px; margin-bottom:10px; background:var(--paper);}
+  .journal-day h4{font-size:0.9rem; margin-bottom:4px;}
+  .journal-day p{font-size:0.82rem; color:var(--ink-soft); margin:0;}
+  footer.tag{text-align:center; font-size:0.75rem; color:var(--ink-soft); margin-top:18px; font-family:'Special Elite';}
 </style>
 </head>
 <body>
-
 <div class="wrap">
-
+  <div class="case-tabs" id="caseTabs"></div>
   <div class="folder-header">
     <div class="header-left">
-      <div class="kicker">🔎 CONFIDENTIAL — DETECTIVE FILES DIVISION</div>
-      <h1>Case #001: The <span>Missing Trophy</span></h1>
-      <div class="stamp">OPEN CASE</div>
+      <div class="kicker" id="hKicker">🔎 CONFIDENTIAL — DETECTIVE FILES DIVISION</div>
+      <h1 id="hTitle"></h1>
+      <div class="stamp" id="hStamp"></div>
     </div>
     <div class="agent-box">
       <label>Lead Detective</label>
       <input id="agentName" type="text" placeholder="Type your name..." />
     </div>
   </div>
-
   <div class="board">
-    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="scoreboard">
         <h3>⭐ Detective Score</h3>
-        <div class="score-total" id="totalStars">0 <small>/ 24 stars</small></div>
+        <div class="score-total" id="totalStars">0 <small>/ 0 stars</small></div>
         <div id="skillRows"></div>
       </div>
-
       <div class="trail">
         <h3>🗺️ Case Trail</h3>
         <ul class="trail-list" id="trailList"></ul>
       </div>
     </div>
-
-    <!-- MAIN STAGE -->
     <div class="stage" id="stage"></div>
   </div>
-
   <footer class="tag">— every clue earns a star. no guessing, only proving. —</footer>
 </div>
 
 <script>
-/* ============ DATA ============ */
-const STATIONS = [
-  {id:0, key:"briefing", label:"The Briefing", icon:"📋", skill:"Focus", maxStars:2},
-  {id:1, key:"warmup",   label:"Evidence Warm-Up", icon:"🔍", skill:"Evidence", maxStars:4},
-  {id:2, key:"story",    label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2},
-  {id:3, key:"board",    label:"The Evidence Board", icon:"🧩", skill:"Evidence", maxStars:4},
-  {id:4, key:"vocab",    label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4},
-  {id:5, key:"note",     label:"The Secret Note (paper)", icon:"✏️", skill:"Spelling", maxStars:2},
-  {id:6, key:"interro",  label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:4},
-  {id:7, key:"report",   label:"Final Detective Report", icon:"🚨", skill:"Writing", maxStars:2},
-  {id:8, key:"closed",   label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0}
-];
+/* ============================================================
+   SHARED HELPERS (used by both cases)
+   ============================================================ */
+function el(html){ const d=document.createElement("div"); d.innerHTML=html.trim(); return d.firstChild; }
 
-const SKILL_ORDER = ["Focus","Evidence","Reading","Vocabulary","Spelling","Writing"];
-const SKILL_MAX = {};
-STATIONS.forEach(s=>{ if(s.maxStars>0) SKILL_MAX[s.skill]=(SKILL_MAX[s.skill]||0)+s.maxStars; });
-
-/* ============ STATE ============ */
-const STORE_KEY = "detectiveCase001_progress_v1";
-let state = loadState();
-
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORE_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return { current:0, completed:{}, stars:{}, agent:"", answers:{} };
-}
-function saveState(){
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
-
-function totalStars(){
-  return Object.values(state.stars).reduce((a,b)=>a+b,0);
-}
-function maxTotalStars(){
-  return STATIONS.reduce((a,s)=>a+s.maxStars,0);
-}
-function skillStars(skill){
-  let sum=0;
-  STATIONS.forEach(s=>{ if(s.skill===skill) sum += (state.stars[s.id]||0); });
-  return sum;
-}
-function isUnlocked(id){
-  if(id===0) return true;
-  return !!state.completed[id-1];
-}
-function awardStars(stationId, n){
-  const st = STATIONS.find(s=>s.id===stationId);
-  state.stars[stationId] = Math.min(n, st.maxStars);
-}
-function markComplete(id){
-  state.completed[id] = true;
-  saveState();
-  renderSidebar();
-}
-
-/* ============ NAME ============ */
-const agentInput = document.getElementById("agentName");
-agentInput.value = state.agent || "";
-agentInput.addEventListener("input", ()=>{
-  state.agent = agentInput.value;
-  saveState();
-});
-
-/* ============ SIDEBAR ============ */
-function renderSidebar(){
-  document.getElementById("totalStars").innerHTML =
-    totalStars() + ` <small>/ ${maxTotalStars()} stars</small>`;
-
-  const skillRows = document.getElementById("skillRows");
-  skillRows.innerHTML = "";
-  SKILL_ORDER.forEach(skill=>{
-    const max = SKILL_MAX[skill]||0;
-    const got = skillStars(skill);
-    const row = document.createElement("div");
-    row.className = "skill-row";
-    let starsHtml = "";
-    for(let i=0;i<max;i++){
-      starsHtml += i < got ? "★" : `<span class="dim">★</span>`;
-    }
-    row.innerHTML = `<span>${skill}</span><span class="stars">${starsHtml}</span>`;
-    skillRows.appendChild(row);
-  });
-
-  const trailList = document.getElementById("trailList");
-  trailList.innerHTML = "";
-  STATIONS.forEach(s=>{
-    const li = document.createElement("li");
-    const done = !!state.completed[s.id];
-    const unlocked = isUnlocked(s.id);
-    const active = state.current === s.id;
-    li.className = "trail-item" + (done?" done":"") + (active?" active":"") + (!unlocked?" locked":"");
-    li.innerHTML = `<span class="pin">${done?"✓":(unlocked?s.icon:"🔒")}</span><span class="label">${s.label}</span>`;
-    if(unlocked){
-      li.addEventListener("click", ()=>{ state.current = s.id; saveState(); render(); });
-    }
-    trailList.appendChild(li);
-  });
-}
-
-/* ============ STAGE RENDERERS ============ */
-function renderStage(){
-  const stage = document.getElementById("stage");
-  const s = STATIONS.find(st=>st.id===state.current);
-  stage.innerHTML = "";
-
-  if(!isUnlocked(s.id)){
-    stage.innerHTML = `<div class="stage-eyebrow">LOCKED FILE</div><h2>🔒 Not yet, detective.</h2><p class="stage-sub">Finish the previous case file first — every clue builds on the last one.</p>`;
-    return;
-  }
-
-  const renderers = {
-    briefing: renderBriefing,
-    warmup: renderWarmup,
-    story: renderStory,
-    board: renderBoard,
-    vocab: renderVocab,
-    note: renderNote,
-    interro: renderInterro,
-    report: renderReport,
-    closed: renderClosed
-  };
-  renderers[s.key](stage, s);
-}
-
-function stageHeader(stage, s, eyebrow, title, sub){
-  const h = document.createElement("div");
-  h.innerHTML = `<div class="stage-eyebrow">${eyebrow}</div><h2>${title}</h2><p class="stage-sub">${sub}</p>`;
-  stage.appendChild(h);
-}
-
-function footer(stage, s, nextEnabledCheck){
-  const f = document.createElement("div");
-  f.className = "stage-footer";
-  const done = !!state.completed[s.id];
-  f.innerHTML = `<span class="status">${done ? "✓ Filed away" : "Not filed yet"}</span>`;
-  const btn = document.createElement("button");
-  btn.className = "btn primary";
-  const isLast = s.id === STATIONS.length-2; // before closed
-  btn.textContent = done ? "Continue" : (isLast ? "File Final Report →" : "Mark Solved & Continue →");
-  btn.addEventListener("click", ()=>{
-    if(!done){
-      markComplete(s.id);
-    }
-    const nextId = s.id+1;
-    if(nextId < STATIONS.length){
-      state.current = nextId;
-      saveState();
-      render();
-    }
-  });
-  f.appendChild(btn);
-  stage.appendChild(f);
-}
-
-/* ---- 0: Briefing ---- */
-function renderBriefing(stage, s){
-  stageHeader(stage, s, "FILE 001 · BRIEFING", "📋 The Briefing", "Before you open the case, read the detective's rules.");
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <p><span class="clue-tag">RULE 1</span> When we're working, we're working.</p>
-    <p><span class="clue-tag">RULE 2</span> "I don't know" is a totally fine thing to say.</p>
-    <p><span class="clue-tag">RULE 3</span> You don't get points for guessing — you get points for <b>proving</b>.</p>
-    <p style="margin-top:10px; color:var(--ink-soft); font-size:0.85rem;">Someone has taken something from the school trophy cabinet. Your job is to figure out what really happened — using evidence, not guesses.</p>
-  `;
-  stage.appendChild(card);
-  awardStars(0,2);
-  footer(stage, s);
-}
-
-/* ---- 1: Warm-up quiz ---- */
-const WARMUP_Q = [
-  {q:"The classroom door was open.", opts:["Fact","Inference"], correct:0, why:"This is stated directly — nothing to figure out."},
-  {q:"Someone probably left the classroom recently.", opts:["Fact","Inference"], correct:1, why:"We're combining a clue (open door) with our own thinking."},
-  {q:"There was a blue backpack beside the desk.", opts:["Fact","Inference"], correct:0, why:"Directly observed — a fact."},
-  {q:"The person who left was probably a student.", opts:["Fact","Inference"], correct:1, why:"We can't know this for sure — it's a reasonable inference."}
-];
-function renderWarmup(stage, s){
-  stageHeader(stage, s, "FILE 001 · WARM-UP", "🔍 Evidence vs. Inference", "Evidence is something the text tells us directly. An inference is something we figure out. Sort each clue below.");
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `<p style="font-family:'Special Elite'; font-size:0.85rem;">"Maya walked into the kitchen. The window was open, her umbrella was dripping on the floor, and there were muddy footprints beside the door."</p>`;
-  stage.appendChild(card);
-
-  let correctCount = 0;
-  const wrapper = document.createElement("div");
-  WARMUP_Q.forEach((item, idx)=>{
-    const block = document.createElement("div");
-    block.className = "q-block";
-    block.innerHTML = `<div class="q-prompt">${idx+1}. ${item.q}</div>`;
-    const opts = document.createElement("div");
-    opts.className = "opts";
+function buildMCQuiz(container, station, questions, ctx){
+  let correct = 0;
+  const graded = questions.length;
+  questions.forEach((item, idx)=>{
+    const block = el(`<div class="q-block card"><div class="q-prompt">${idx+1}. ${item.q}</div></div>`);
+    const opts = el(`<div class="opts"></div>`);
     item.opts.forEach((label, oi)=>{
-      const b = document.createElement("button");
-      b.className = "opt";
-      b.textContent = label;
+      const b = el(`<button class="opt">${label}</button>`);
       b.addEventListener("click", ()=>{
         [...opts.children].forEach(c=>c.disabled=true);
-        if(oi===item.correct){
-          b.classList.add("correct");
-          correctCount++;
-        } else {
-          b.classList.add("wrong");
-          opts.children[item.correct].classList.add("correct");
+        if(oi===item.correct){ b.classList.add("correct"); correct++; }
+        else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+        if(item.why){
+          fb.classList.add("show", oi===item.correct?"good":"bad");
+          fb.textContent = item.why;
         }
-        fb.classList.add("show", oi===item.correct?"good":"bad");
-        fb.textContent = item.why;
-        awardStars(1, correctCount);
-        renderSidebar();
+        ctx.awardStars(station.id, Math.round(correct/graded*station.maxStars));
+        ctx.refresh();
       });
       opts.appendChild(b);
     });
     block.appendChild(opts);
-    const fb = document.createElement("div");
-    fb.className = "feedback";
-    block.appendChild(fb);
-    wrapper.appendChild(block);
+    if(item.why){
+      const fb = el(`<div class="feedback"></div>`);
+      block.appendChild(fb);
+    }
+    container.appendChild(block);
   });
-  stage.appendChild(wrapper);
-  footer(stage, s);
 }
 
-/* ---- 2: Story ---- */
-const STORY_PARAGRAPHS = [
+function buildFreeResponse(container, station, items, ctx, keyPrefix){
+  items.forEach((item, idx)=>{
+    const savedKey = keyPrefix+"_"+idx;
+    const block = el(`
+      <div class="card q-block">
+        <div class="q-prompt">${idx+1}. ${item.q}</div>
+        <textarea placeholder="Type your answer here...">${ctx.getAnswer(savedKey)||""}</textarea>
+        <button class="reveal-btn">🔎 Compare with case notes</button>
+        <div class="sample-answer">${item.sample}</div>
+      </div>`);
+    const ta = block.querySelector("textarea");
+    const btn = block.querySelector(".reveal-btn");
+    const sample = block.querySelector(".sample-answer");
+    ta.addEventListener("input", ()=>{ ctx.setAnswer(savedKey, ta.value); });
+    btn.addEventListener("click", ()=>{
+      sample.classList.add("show");
+      if(!ctx.getAnswer(savedKey+"_revealed")){
+        ctx.setAnswer(savedKey+"_revealed", true);
+        let n=0;
+        items.forEach((_,i2)=>{ if(ctx.getAnswer(keyPrefix+"_"+i2+"_revealed")) n++; });
+        ctx.awardStars(station.id, Math.round(n/items.length*station.maxStars));
+        ctx.refresh();
+      }
+    });
+    container.appendChild(block);
+  });
+}
+
+function buildPaperTask(container, station, noteHtml, checkLabel, ctx, key){
+  container.appendChild(el(`<div class="paper-note">${noteHtml}</div>`));
+  const check = el(`<label class="checkline"><input type="checkbox"> ${checkLabel}</label>`);
+  const cb = check.querySelector("input");
+  cb.checked = !!ctx.getAnswer(key);
+  cb.addEventListener("change", ()=>{
+    ctx.setAnswer(key, cb.checked);
+    ctx.awardStars(station.id, cb.checked ? station.maxStars : 0);
+    ctx.refresh();
+  });
+  if(cb.checked) ctx.awardStars(station.id, station.maxStars);
+  container.appendChild(check);
+}
+
+/* ============================================================
+   CASE #001 — THE MISSING TROPHY
+   ============================================================ */
+const CASE1_WARMUP_STORY = `Ms. Reyes got back from the staff room to find the classroom door wide open. A blue backpack sat on the floor beside one of the desks, and a half-finished worksheet lay next to it, the pencil still resting on top.`;
+const CASE1_WARMUP_Q = [
+  {q:"The classroom door was open.", opts:["Fact","Inference"], correct:0, why:"Stated directly in the passage — nothing to figure out."},
+  {q:"Someone probably left the classroom recently.", opts:["Fact","Inference"], correct:1, why:"The open door plus the pencil still resting on an unfinished worksheet suggest this — but it isn't stated outright."},
+  {q:"There was a blue backpack beside the desk.", opts:["Fact","Inference"], correct:0, why:"Directly stated — a fact."},
+  {q:"The person who left was probably a student.", opts:["Fact","Inference"], correct:1, why:"A backpack and a worksheet suggest a student, but the passage never says who it was."}
+];
+const CASE1_STORY = [
   "It was Monday morning when Ms. Patel noticed something unusual.",
   "The glass trophy cabinet near the front office was supposed to contain six trophies from the school's annual competitions. Five trophies were sitting exactly where they belonged. The sixth was missing — the Greenwood Science Challenge Trophy, a silver cup the school had won three years in a row.",
   "Ms. Patel immediately checked the cabinet. There was no broken glass, and the lock did not appear damaged. \"Interesting,\" she said.",
@@ -754,290 +317,614 @@ const STORY_PARAGRAPHS = [
   "Marcus arrived last. \"I wasn't near the office this morning. I was in the library.\" Then the school librarian, Mr. Chen, walked in. \"I actually saw Marcus this morning — he came into the library at 8:10.\" Marcus looked relieved.",
   "But Ms. Patel wasn't finished. She examined the floor near the trophy cabinet and found several tiny drops of green paint. She looked at Evan's cardboard box — there was green paint on the side, too. Evan immediately looked nervous.",
   "\"Wait!\" he said. \"That doesn't mean I took the trophy!\" Ms. Patel examined the paint more closely. \"You're right. It doesn't.\" Then she noticed something else: the green paint was still wet.",
-  "\"Where did you paint your volcano?\" she asked. \"In the art room.\" \"When?\" \"Yesterday afternoon.\" Ms. Patel smiled. \"Then your paint shouldn't still be wet.\" Evan's face went pale. Ms. Patel walked toward the art room. The case wasn't over yet."
+  "\"Where did you paint your volcano?\" she asked. \"In the art room.\" \"When?\" \"Yesterday afternoon.\" Ms. Patel smiled. \"Then your paint shouldn't still be wet.\" Evan's face went pale."
 ];
-function renderStory(stage, s){
-  stageHeader(stage, s, "FILE 001 · THE CASE", "📖 The Missing Trophy", "Read carefully — every detail could be a clue.");
-  const card = document.createElement("div");
-  card.className = "card story";
-  card.innerHTML = STORY_PARAGRAPHS.map(p=>`<p>${p}</p>`).join("");
-  stage.appendChild(card);
-  awardStars(2,2);
-  footer(stage, s);
-}
-
-/* ---- 3: Evidence Board ---- */
+const CASE1_STORY_2 = [
+  "\"Wait,\" Evan said. \"I know why that's there.\" He opened his cardboard box and pulled out a small paintbrush. \"My volcano broke this morning. I had to repaint one side before I brought it to school.\"",
+  "Ms. Patel examined the box again. The green paint matched the paint on Evan's volcano exactly. \"So you painted this morning?\" she asked. Evan nodded. \"Yes. That's why it's still wet.\" The paint had come from Evan's box — not from the trophy cabinet. Evan was no longer a strong suspect.",
+  "Ms. Patel thought back to Marcus's story. \"I wasn't near the office this morning. I was in the library,\" he had said — and Mr. Chen had confirmed seeing him there at 8:10.",
+  "She checked the library's sign-in sheet. Marcus had signed in at 8:10. His story appeared to be true. But then she checked the security camera. The footage showed Marcus entering the library at 8:10... alone. Nobody was there to see him.",
+  "Mr. Chen had lied. He hadn't actually seen Marcus at 8:10 — he'd said it to give his nephew an alibi. Marcus had taken the trophy to use as a prop for a school project, planning to return it later, but panicked when it was discovered missing.",
+  "The trophy was found hidden behind a stack of old books in the library. Marcus admitted taking it. Mr. Chen admitted lying about seeing him."
+];
+const CASE1_INTERRO_Q = [
+  {q:"What was missing from the trophy cabinet?", sample:"The Greenwood Science Challenge Trophy."},
+  {q:"What two details made Evan seem suspicious?", sample:"He was near the trophy cabinet, and his box had green paint on it that was still wet."},
+  {q:"Why did Ms. Patel become suspicious when she learned the paint was still wet?", sample:"Because Evan said he painted his volcano yesterday afternoon — so the paint should have dried by Monday morning."},
+  {q:"Is Evan definitely the person who stole the trophy? Explain why or why not.", sample:"No — we can't say for certain. The evidence makes him suspicious, but the story never actually shows him taking the trophy. Suspicious isn't the same as proven."}
+];
 const SUSPECTS = [
   {name:"Evan", info:"Near the cabinet around 8:05. Cardboard box with green paint — still wet."},
   {name:"Sophie", info:"Near the office at 8:15. Saw the cabinet but nothing else."},
   {name:"Marcus", info:"In the library at 8:10 — confirmed by Mr. Chen."}
 ];
-function renderBoard(stage, s){
-  stageHeader(stage, s, "FILE 001 · EVIDENCE BOARD", "🧩 The Evidence Board", "For each suspect, decide: does the evidence make them Suspicious, or are they Cleared?");
-  const grid = document.createElement("div");
-  grid.className = "grid-2";
-  let filled = 0;
-  SUSPECTS.forEach((sus, i)=>{
-    const card = document.createElement("div");
-    card.className = "suspect-card";
-    card.innerHTML = `<h4>${sus.name}</h4><p>${sus.info}</p>
-      <select id="sel-${i}">
-        <option value="">— choose —</option>
-        <option value="Suspicious">🟡 Suspicious</option>
-        <option value="Cleared">🟢 Cleared</option>
-      </select>`;
-    grid.appendChild(card);
-  });
-  stage.appendChild(grid);
-
-  const q = document.createElement("div");
-  q.className = "card";
-  q.style.marginTop = "16px";
-  q.innerHTML = `
-    <div class="q-prompt">Does the green paint prove Evan stole the trophy?</div>
-    <div class="opts" id="paintOpts">
-      <button class="opt">Yes, it proves it</button>
-      <button class="opt">No — it makes him suspicious, but it doesn't prove it</button>
-    </div>
-    <div class="feedback" id="paintFb"></div>
-  `;
-  stage.appendChild(q);
-
-  const opts = q.querySelector("#paintOpts");
-  const fb = q.querySelector("#paintFb");
-  [...opts.children].forEach((b, oi)=>{
-    b.addEventListener("click", ()=>{
-      [...opts.children].forEach(c=>c.disabled=true);
-      if(oi===1){ b.classList.add("correct"); }
-      else { b.classList.add("wrong"); opts.children[1].classList.add("correct"); }
-      fb.classList.add("show", oi===1?"good":"bad");
-      fb.textContent = "Right — a good detective knows the difference between suspicious and proven. We need more evidence before we can be sure.";
-      checkBoardStars();
-    });
-  });
-
-  [0,1,2].forEach(i=>{
-    document.getElementById(`sel-${i}`).addEventListener("change", checkBoardStars);
-  });
-
-  function checkBoardStars(){
-    let n = 0;
-    [0,1,2].forEach(i=>{ if(document.getElementById(`sel-${i}`).value) n++; });
-    const paintAnswered = opts.children[0].disabled;
-    let stars = 0;
-    if(n>=3) stars += 3;
-    else if(n>0) stars += 1;
-    if(paintAnswered) stars += 1;
-    awardStars(3, stars);
-    renderSidebar();
-  }
-
-  footer(stage, s);
-}
-
-/* ---- 4: Vocabulary ---- */
-const VOCAB_Q = [
+const CASE1_VOCAB_Q = [
   {word:"unusual", sentence:'"Ms. Patel noticed something unusual."', opts:["Ordinary","Strange or uncommon","Enormous","Dangerous"], correct:1},
   {word:"immediately", sentence:'"Ms. Patel immediately checked the cabinet."', opts:["Later that day","Slowly","Right away","Never"], correct:2},
   {word:"examined", sentence:'"Ms. Patel examined the floor."', opts:["Ignored","Looked at carefully","Cleaned","Painted"], correct:1},
   {word:"suspicious", sentence:'"Evan immediately looked nervous and suspicious."', opts:["Calm and relaxed","Making people think something is wrong","Very happy","Extremely tired"], correct:1}
 ];
-function renderVocab(stage, s){
-  stageHeader(stage, s, "FILE 001 · VOCABULARY", "🔤 Vocabulary Detective", "Use context clues from the sentence to figure out what each word means.");
 
-  let correctCount = 0;
-  VOCAB_Q.forEach((item, idx)=>{
-    const block = document.createElement("div");
-    block.className = "q-block card";
-    block.innerHTML = `<div class="q-prompt">${idx+1}. ${item.word} — ${item.sentence}</div>`;
-    const opts = document.createElement("div");
-    opts.className = "opts";
-    item.opts.forEach((label, oi)=>{
-      const b = document.createElement("button");
-      b.className = "opt";
-      b.textContent = label;
-      b.addEventListener("click", ()=>{
-        [...opts.children].forEach(c=>c.disabled=true);
-        if(oi===item.correct){ b.classList.add("correct"); correctCount++; }
-        else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
-        awardStars(4, correctCount);
-        renderSidebar();
-      });
-      opts.appendChild(b);
+const CASE1 = {
+  id:"001", tabLabel:"Case #001", tabSub:"Missing Trophy",
+  title:'Case #001: The <span>Missing Trophy</span>', stamp:"OPEN CASE",
+  stations:[
+    {id:0, key:"briefing", label:"The Briefing", icon:"📋", skill:"Focus", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · BRIEFING", "📋 The Briefing", "Before you open the case, read the detective's rules.");
+        stage.appendChild(el(`<div class="card">
+          <p><span class="clue-tag">RULE 1</span> When we're working, we're working.</p>
+          <p><span class="clue-tag">RULE 2</span> "I don't know" is a totally fine thing to say.</p>
+          <p><span class="clue-tag">RULE 3</span> You don't get points for guessing — you get points for <b>proving</b>.</p>
+          <p style="margin-top:10px; color:var(--ink-soft); font-size:0.85rem;">Someone has taken something from the school trophy cabinet. Your job is to figure out what really happened — using evidence, not guesses.</p>
+        </div>`));
+        ctx.awardStars(0,2);
+        footer(stage, s, ctx);
+      }},
+    {id:1, key:"warmup", label:"Evidence Warm-Up", icon:"🔍", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · WARM-UP", "🔍 Evidence vs. Inference", "Evidence is something the text tells us directly. An inference is something we figure out. Read the passage, then sort each clue below.");
+        stage.appendChild(el(`<div class="card"><p style="font-family:'Special Elite'; font-size:0.85rem;">${CASE1_WARMUP_STORY}</p></div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE1_WARMUP_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:2, key:"story", label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · THE CASE", "📖 The Missing Trophy", "Read carefully — every detail could be a clue.");
+        stage.appendChild(el(`<div class="card story">${CASE1_STORY.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        ctx.awardStars(2,2);
+        footer(stage, s, ctx);
+      }},
+    {id:3, key:"board", label:"The Evidence Board", icon:"🧩", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · EVIDENCE BOARD", "🧩 The Evidence Board", "For each suspect, decide: does the evidence make them Suspicious, or are they Cleared?");
+        const grid = el(`<div class="grid-2"></div>`);
+        SUSPECTS.forEach((sus,i)=>{
+          grid.appendChild(el(`<div class="suspect-card"><h4>${sus.name}</h4><p>${sus.info}</p>
+            <select id="sel-${i}"><option value="">— choose —</option><option value="Suspicious">🟡 Suspicious</option><option value="Cleared">🟢 Cleared</option></select></div>`));
+        });
+        stage.appendChild(grid);
+        const q = el(`<div class="card" style="margin-top:16px;">
+          <div class="q-prompt">Does the green paint prove Evan stole the trophy?</div>
+          <div class="opts" id="paintOpts">
+            <button class="opt">Yes, it proves it</button>
+            <button class="opt">No — it makes him suspicious, but it doesn't prove it</button>
+          </div>
+          <div class="feedback" id="paintFb"></div></div>`);
+        stage.appendChild(q);
+        const opts = q.querySelector("#paintOpts");
+        const fb = q.querySelector("#paintFb");
+        [...opts.children].forEach((b,oi)=>{
+          b.addEventListener("click", ()=>{
+            [...opts.children].forEach(c=>c.disabled=true);
+            if(oi===1){ b.classList.add("correct"); } else { b.classList.add("wrong"); opts.children[1].classList.add("correct"); }
+            fb.classList.add("show", oi===1?"good":"bad");
+            fb.textContent = "Right — a good detective knows the difference between suspicious and proven. We need more evidence before we can be sure.";
+            checkBoardStars();
+          });
+        });
+        [0,1,2].forEach(i=>document.getElementById(`sel-${i}`).addEventListener("change", checkBoardStars));
+        function checkBoardStars(){
+          let n=0; [0,1,2].forEach(i=>{ if(document.getElementById(`sel-${i}`).value) n++; });
+          const paintAnswered = opts.children[0].disabled;
+          let stars=0; if(n>=3) stars+=3; else if(n>0) stars+=1; if(paintAnswered) stars+=1;
+          ctx.awardStars(3, stars); ctx.refresh();
+        }
+        footer(stage, s, ctx);
+      }},
+    {id:4, key:"vocab", label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · VOCABULARY", "🔤 Vocabulary Detective", "Use context clues from the sentence to figure out what each word means.");
+        let correct=0;
+        CASE1_VOCAB_Q.forEach((item, idx)=>{
+          const block = el(`<div class="q-block card"><div class="q-prompt">${idx+1}. ${item.word} — ${item.sentence}</div></div>`);
+          const opts = el(`<div class="opts"></div>`);
+          item.opts.forEach((label,oi)=>{
+            const b = el(`<button class="opt">${label}</button>`);
+            b.addEventListener("click", ()=>{
+              [...opts.children].forEach(c=>c.disabled=true);
+              if(oi===item.correct){ b.classList.add("correct"); correct++; } else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+              ctx.awardStars(4, correct); ctx.refresh();
+            });
+            opts.appendChild(b);
+          });
+          block.appendChild(opts); stage.appendChild(block);
+        });
+        stage.appendChild(el(`<div class="card">
+          <div class="q-prompt">🧬 Word Detective: what's the base word in "unusual"?</div>
+          <div class="word-parts"><span>un-</span><span>usual</span><span>= unusual</span></div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">"un-" flips a word to mean the opposite. Try it yourself: what happens when you add "-ness" to "nervous"?</p>
+          <div class="word-parts"><span>nervous</span><span>+ -ness</span><span>= nervousness</span></div></div>`));
+        footer(stage, s, ctx);
+      }},
+    {id:5, key:"note", label:"The Secret Note (paper)", icon:"✏️", skill:"Spelling", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · PAPER EVIDENCE", "✏️ The Secret Note", "This part happens on paper with your tutor — grab a pencil!");
+        buildPaperTask(stage, s, `<b>📝 Messy note found at the scene:</b><br><br><i>"i saw evan near the trophy cabinet but he wasnt alone"</i><br><br>
+          Rewrite it correctly on paper — fix the capital letter, the comma, and the apostrophe. Then write these three words neatly, twice each: <b>evidence · suspicious · examined</b>.`,
+          "I finished the secret note on paper with my tutor", ctx, "noteDone");
+        footer(stage, s, ctx);
+      }},
+    {id:6, key:"interro", label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · INTERROGATION", "🧠 The Interrogation", "Answer in your own words. Click \"Compare with case notes\" to check your thinking after you write.");
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE1_INTERRO_Q, ctx, "c1_interro");
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:7, key:"report", label:"Final Detective Report", icon:"🚨", skill:"Writing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 001 · FINAL REPORT", "🚨 Final Detective Report", "Who do you think is responsible? Use at least two pieces of evidence — 3 to 5 sentences.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem; color:var(--ink-soft);">Need a starting point? Try:<br>
+          <i>I think ______ is responsible because ______. One piece of evidence is ______. Another clue is ______. This makes me think ______.</i></p></div>`));
+        const ta = el(`<textarea placeholder="Write your final detective report here..." style="min-height:150px;"></textarea>`);
+        ta.value = ctx.getAnswer("finalReport")||"";
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("finalReport", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(7, words>=15?2:(words>0?1:0)); ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){ const words = ta.value.trim().split(/\s+/).filter(Boolean).length; ctx.awardStars(7, words>=15?2:1); }
+        footer(stage, s, ctx);
+      }},
+    {id:8, key:"closed", label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0,
+      render:(stage, s, ctx)=>{
+        stage.innerHTML="";
+        const name = ctx.getAgent() || "Detective";
+        stage.appendChild(el(`<div class="closed-banner">
+          <div class="stamp-big">CASE CLOSED</div>
+          <h2>Solved it, ${name}!</h2>
+          <p class="stage-sub" style="max-width:560px; margin:10px auto 0;">Read what really happened...</p></div>`));
+        stage.appendChild(el(`<div class="card story" style="max-width:640px; margin:0 auto 16px;">${CASE1_STORY_2.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:560px; margin:0 auto 16px;">
+          <div class="q-prompt">🧠 What this case taught us</div>
+          <p style="font-size:0.85rem;">• <b>Evan:</b> suspicious evidence isn't proof.<br>
+          • <b>Marcus:</b> an alibi can look convincing but still needs to be checked.<br>
+          • <b>Mr. Chen:</b> even a witness's story is evidence that has to be evaluated, not just trusted.</p></div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
+          <div class="q-prompt">🏅 Achievement unlocked: Rookie Detective</div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
+        const rta = reflect.querySelector("textarea");
+        rta.value = ctx.getAnswer("reflection")||"";
+        rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
+        stage.appendChild(reflect);
+        if(!ctx.isComplete(8)) ctx.markComplete(8);
+      }}
+  ]
+};
+
+/* ============================================================
+   CASE #002 — THE ANONYMOUS LETTER
+   ============================================================ */
+const CASE2_POV_Q = [
+  {q:"I couldn't believe what I saw.", opts:["First person","Third person"], correct:0},
+  {q:"Marcus opened the door slowly.", opts:["First person","Third person"], correct:1},
+  {q:"We heard footsteps behind us.", opts:["First person","Third person"], correct:0},
+  {q:"Sophie looked around the empty classroom.", opts:["First person","Third person"], correct:1},
+  {q:"I knew someone had been following me.", opts:["First person","Third person"], correct:0},
+  {q:"They ran toward the library.", opts:["First person","Third person"], correct:1},
+  {q:"My hands were shaking as I opened the envelope.", opts:["First person","Third person"], correct:0},
+  {q:"Emma didn't understand why everyone was staring at her.", opts:["First person","Third person"], correct:1},
+  {q:"We decided to keep the letter a secret.", opts:["First person","Third person"], correct:0},
+  {q:"Daniel picked up the note and read it carefully.", opts:["First person","Third person"], correct:1}
+];
+const CASE2_VOCAB_Q = [
+  {word:"deserted", sentence:'"The hallway was deserted. There wasn\'t a single person anywhere."', opts:["Crowded","Empty or abandoned","Loud","Colourful"], correct:1},
+  {word:"reluctant", sentence:'"Maya was reluctant to open the letter because she was afraid of what it might say."', opts:["Excited","Hesitant or unsure","Angry","Confused"], correct:1},
+  {word:"astonished", sentence:'"The detective was astonished when he discovered the hidden room. He couldn\'t believe it existed."', opts:["Bored","Extremely surprised","Annoyed","Tired"], correct:1},
+  {word:"illegible", sentence:'"The note was illegible. The handwriting was so messy that nobody could read it."', opts:["Impossible to read","Very neat","Short","Colourful"], correct:0},
+  {word:"conceal", sentence:'"Daniel tried to conceal the envelope by putting it underneath his notebook."', opts:["Show","Hide","Throw away","Copy"], correct:1},
+  {word:"brief", sentence:'"The librarian gave a brief explanation. She spoke for only thirty seconds."', opts:["Short","Long","Confusing","Loud"], correct:0},
+  {word:"timid", sentence:'"Unlike his confident sister, Liam was timid and rarely spoke in front of others."', opts:["Shy or nervous","Bold","Funny","Talkative"], correct:0},
+  {word:"significant", sentence:'"The evidence was significant because it could help solve the mystery."', opts:["Unimportant","Important","Boring","Missing"], correct:1}
+];
+const CASE2_WORDBUILD_Q = [
+  {q:"unhappy — what does un- do here?", opts:["Makes it mean the opposite (not happy)","Makes it mean 'again'","Makes it a question"], correct:0},
+  {q:"hopeful — what does -ful mean?", opts:["Without","Full of","Again"], correct:1},
+  {q:"careless — what does -less mean?", opts:["Without","Full of","Not"], correct:0},
+  {q:"reread — what does re- mean?", opts:["Again","Not","Full of"], correct:0},
+  {q:"disagreement — what does dis- suggest?", opts:["Opposite / not","More of","Before"], correct:0}
+];
+const CASE2_STORY = [
+  "It was Thursday afternoon when Ms. Rivera found an envelope underneath her classroom door. There was no name on it. On the front, someone had written: READ THIS ALONE.",
+  "Ms. Rivera opened the envelope carefully. Inside was a short letter.",
+];
+const CASE2_LETTER = `Dear Ms. Rivera,<br><br>Someone has been taking things from the students' desks. I know who it is.<br><br>You should check the library tomorrow at 4:00.<br><br>But don't tell anyone that I wrote this.<br><br>Someone is watching.<br><br>—A Student`;
+const CASE2_STORY_2 = [
+  "Ms. Rivera read the letter twice. She immediately noticed something strange. The writer said they knew who had been taking things, but they never actually said the person's name.",
+  "The next morning, Ms. Rivera showed the letter to the principal. \"We need to be careful,\" the principal said. \"We don't know whether this person is telling the truth.\"",
+  "At 3:45, Ms. Rivera walked toward the library. The library was unusually quiet. She looked through the glass doors. Nobody was inside except Mr. Chen, the librarian. \"You're here early,\" Mr. Chen said.",
+  "Ms. Rivera looked at the clock. It was exactly 4:00. \"I received an anonymous letter yesterday,\" she explained. \"It told me to come here.\" Mr. Chen's expression changed. \"A letter?\" he asked.",
+  "Before Ms. Rivera could answer, a book fell from one of the shelves. Both of them turned toward the sound. There was a small envelope lying on the floor. Ms. Rivera picked it up. This envelope had the same handwriting as the first letter.",
+];
+const CASE2_LETTER_2 = `YOU'RE LOOKING IN THE WRONG PLACE.`;
+const CASE2_STORY_3 = [
+  "Ms. Rivera looked at Mr. Chen. \"Then where should I be looking?\" Mr. Chen didn't answer. He simply stared at the envelope. Something about the situation didn't feel right."
+];
+const CASE2_BASIC_Q = [
+  {q:"Where was the first letter found?", sample:"Under Ms. Rivera's classroom door."},
+  {q:"Who was the letter addressed to?", sample:"Ms. Rivera."},
+  {q:"What did the writer claim?", sample:"That someone had been taking things from students' desks and the writer knew who it was."},
+  {q:"Where did the letter tell Ms. Rivera to go, and at what time?", sample:"The library, at 4:00."},
+  {q:"Who was in the library when Ms. Rivera arrived?", sample:"Mr. Chen, the librarian."},
+  {q:"What did Ms. Rivera find on the floor, and what was unusual about it?", sample:"Another envelope — it had the same handwriting as the first letter."}
+];
+const CASE2_INFER_Q = [
+  {q:"Why might the writer have remained anonymous?", sample:"They might have been afraid, not wanted to get in trouble, or wanted to protect themselves — there can be more than one reasonable inference, as long as you can explain your reasoning."},
+  {q:"Why do you think the principal was cautious?", sample:"Because there was no proof that the anonymous writer was telling the truth."},
+  {q:"Why might the writer have told Ms. Rivera to go to the library?", sample:"Maybe they wanted her to find another clue, something was happening there, or they wanted to communicate without revealing themselves."},
+  {q:"What makes Mr. Chen potentially suspicious? Does this prove he wrote the letter?", sample:"He was the only other person in the library, his expression changed, and he stared at the envelope without answering. But no — this doesn't prove anything. It's suspicious, not proven."}
+];
+const CASE2_POV_STORY_Q = [
+  {q:"What point of view is the story written in? How do you know?", sample:"Third person — the story uses names and words like she, he, and they instead of I or me."},
+  {q:"Whose perspective do we mostly follow?", sample:"Ms. Rivera's."},
+  {q:"Does the narrator tell us exactly what Mr. Chen is thinking? Why does that matter?", sample:"No — the reader has to infer what Mr. Chen might be thinking from his actions. Point of view controls what information the reader receives."}
+];
+const CASE2_PURPOSE_Q = [
+  {q:"A textbook explains how volcanoes form.", opts:["Inform","Entertain","Persuade"], correct:0},
+  {q:"A story describes a girl discovering a secret room.", opts:["Inform","Entertain","Persuade"], correct:1},
+  {q:"An article argues that schools should have more outdoor learning.", opts:["Inform","Entertain","Persuade"], correct:2},
+  {q:"A poster explains how to recycle properly.", opts:["Inform","Entertain","Persuade"], correct:0},
+  {q:"An advertisement tells people why they should buy a certain backpack.", opts:["Inform","Entertain","Persuade"], correct:2},
+  {q:"A mystery novel follows a detective searching for a missing painting.", opts:["Inform","Entertain","Persuade"], correct:1}
+];
+const CASE2_APPLY_Q = [
+  {q:"What is the author's main purpose in writing \"The Anonymous Letter\"? How do you know?", sample:"Mainly to entertain — the story creates a mystery and makes the reader want to know who wrote the letters. (It also gives some information along the way, but that's not its main purpose — a text can have more than one purpose, though usually one is dominant.)"}
+];
+const CASE2_EVIDENCE_LOG = [
+  {ev:"Anonymous letter", hint:"Writer doesn't want to be identified"},
+  {ev:"Writer knows about stolen items", hint:"Writer may have seen something"},
+  {ev:"Letter sends Ms. Rivera to library", hint:"Library may contain another clue"},
+  {ev:"Mr. Chen's expression changes", hint:"He may know something"},
+  {ev:"Second letter has same handwriting", hint:"Same person may have written both"}
+];
+
+const CASE2 = {
+  id:"002", tabLabel:"Case #002", tabSub:"Anonymous Letter",
+  title:'Case #002: The <span>Anonymous Letter</span>', stamp:"OPEN CASE",
+  stations:[
+    {id:0, key:"briefing", label:"The Briefing", icon:"📋", skill:"Focus", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · BRIEFING", "📋 The Briefing", "A new file, detective.");
+        stage.appendChild(el(`<div class="card">
+          <p>Last week, we investigated a missing trophy. This week we have a completely different problem: someone has been leaving anonymous letters around the school. We don't know who wrote them.</p>
+          <p style="margin-top:8px;">Today you'll learn how to figure out what a writer is telling you — even when they don't say it directly. You'll need three skills: <b>point of view</b>, <b>vocabulary</b>, and <b>author's purpose</b>.</p>
+        </div>`));
+        ctx.awardStars(0,2);
+        footer(stage, s, ctx);
+      }},
+    {id:1, key:"pov", label:"Point of View", icon:"👀", skill:"Reading", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · POINT OF VIEW", "👀 Point of View", "Point of view = whose eyes are we seeing the story through? First person uses I / me / we. Third person uses he / she / they.");
+        stage.appendChild(el(`<div class="card">
+          <p><b>First person:</b> "I walked into the library and saw a strange envelope on the desk." — the narrator is inside the story.</p>
+          <p style="margin-top:6px;"><b>Third person:</b> "Maya walked into the library and saw a strange envelope on the desk." — the narrator is outside the story.</p>
+        </div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE2_POV_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:2, key:"pov_rewrite", label:"POV Rewrite (paper)", icon:"🔄", skill:"Writing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · PAPER CHALLENGE", "🔄 Change the Point of View", "Grab a pencil for this one.");
+        buildPaperTask(stage, s, `<b>Part A — rewrite in third person:</b><br>"I opened the mysterious envelope. Inside, I found a note that said, 'Don't trust anyone.' I immediately looked around the room."<br><br>
+          <b>Part B — rewrite in first person:</b><br>"Ethan walked into the classroom and noticed a strange message on the board. He didn't know who had written it."`,
+          "I finished both rewrites on paper with my tutor", ctx, "povRewriteDone");
+        footer(stage, s, ctx);
+      }},
+    {id:3, key:"vocab", label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · VOCABULARY", "🔤 Vocabulary Detective", "Context clues are hints around a word that help you figure out its meaning. Read each sentence and choose the best meaning.");
+        let correct=0;
+        const total = CASE2_VOCAB_Q.length;
+        CASE2_VOCAB_Q.forEach((item, idx)=>{
+          const block = el(`<div class="q-block card"><div class="q-prompt">${idx+1}. ${item.word} — ${item.sentence}</div></div>`);
+          const opts = el(`<div class="opts"></div>`);
+          item.opts.forEach((label,oi)=>{
+            const b = el(`<button class="opt">${label}</button>`);
+            b.addEventListener("click", ()=>{
+              [...opts.children].forEach(c=>c.disabled=true);
+              if(oi===item.correct){ b.classList.add("correct"); correct++; } else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+              ctx.awardStars(3, Math.round(correct/total*4)); ctx.refresh();
+            });
+            opts.appendChild(b);
+          });
+          block.appendChild(opts); stage.appendChild(block);
+        });
+        footer(stage, s, ctx);
+      }},
+    {id:4, key:"wordbuild", label:"Word Building", icon:"🧬", skill:"Spelling", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · WORD BUILDING", "🧬 Word Detective", "Prefixes and suffixes change a word's meaning. Figure out what each one does.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE2_WORDBUILD_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:5, key:"handwriting", label:"Handwriting Check (paper)", icon:"✒️", skill:"Spelling", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · PAPER RITUAL", "✒️ The Detective's Handwriting Check", "A detective's notes have to be readable — if no one else can read your evidence, that's a problem.");
+        buildPaperTask(stage, s, `Sentence: <i>"The anonymous letter contained three important clues."</i><br><br>
+          1. Copy it carefully.<br>2. Underline the three important words.<br>3. Rewrite it in your best handwriting.<br>4. Cover it up, then write it again from memory.<br><br>
+          Compare the two versions — was the second one accurate?`,
+          "I finished the handwriting check on paper with my tutor", ctx, "handwritingDone");
+        footer(stage, s, ctx);
+      }},
+    {id:6, key:"story", label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · THE CASE", "📖 The Anonymous Letter", "Read carefully — this one has two secret letters hidden inside it.");
+        const card = el(`<div class="card story"></div>`);
+        CASE2_STORY.forEach(p=>card.appendChild(el(`<p>${p}</p>`)));
+        card.appendChild(el(`<p class="letter">${CASE2_LETTER}</p>`));
+        CASE2_STORY_2.forEach(p=>card.appendChild(el(`<p>${p}</p>`)));
+        card.appendChild(el(`<p class="letter">${CASE2_LETTER_2}</p>`));
+        CASE2_STORY_3.forEach(p=>card.appendChild(el(`<p>${p}</p>`)));
+        stage.appendChild(card);
+        ctx.awardStars(6,2);
+        footer(stage, s, ctx);
+      }},
+    {id:7, key:"interro", label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · INTERROGATION", "🧠 The Interrogation", "First the basics, then the harder inference questions. Remember — more than one inference can be reasonable, as long as you explain your thinking.");
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE2_BASIC_Q, ctx, "c2_basic");
+        buildFreeResponse(wrap, s, CASE2_INFER_Q, ctx, "c2_infer");
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:8, key:"pov_story", label:"POV in the Story", icon:"👁️", skill:"Reading", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · POINT OF VIEW", "👁️ Point of View in the Story", "Now apply what you learned about point of view to the actual case.");
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE2_POV_STORY_Q, ctx, "c2_pov");
+        stage.appendChild(wrap);
+        stage.appendChild(el(`<div class="card"><div class="q-prompt">Bonus rewrite: change this to first person, from Ms. Rivera's perspective —</div>
+          <p style="font-size:0.85rem; font-style:italic;">"Ms. Rivera picked up the envelope. This envelope had the same handwriting as the first letter. Ms. Rivera looked at Mr. Chen."</p></div>`));
+        const ta = el(`<textarea placeholder="Rewrite it here in first person..."></textarea>`);
+        ta.value = ctx.getAnswer("povBonusRewrite")||"";
+        ta.addEventListener("input", ()=>ctx.setAnswer("povBonusRewrite", ta.value));
+        stage.appendChild(ta);
+        footer(stage, s, ctx);
+      }},
+    {id:9, key:"purpose", label:"Author's Purpose", icon:"🎯", skill:"Reading", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · AUTHOR'S PURPOSE", "🎯 Why Did the Author Write This?", "Three big purposes: to INFORM (teach), to ENTERTAIN (tell a story), or to PERSUADE (convince).");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE2_PURPOSE_Q, ctx);
+        stage.appendChild(wrap);
+        buildFreeResponse(wrap, s, CASE2_APPLY_Q, ctx, "c2_purpose_apply");
+        footer(stage, s, ctx);
+      }},
+    {id:10, key:"evlog", label:"The Evidence Log", icon:"🗂️", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · EVIDENCE LOG", "🗂️ The Evidence Log", "For each piece of evidence, write what you think it might mean. There's no single right answer — explain your thinking.");
+        const table = el(`<table class="log"><thead><tr><th>Evidence</th><th>What it might mean</th></tr></thead><tbody></tbody></table>`);
+        const tbody = table.querySelector("tbody");
+        CASE2_EVIDENCE_LOG.forEach((row, idx)=>{
+          const tr = el(`<tr><td class="ev">${row.ev}</td><td><input type="text" class="line-input" placeholder="Your idea..." /></td></tr>`);
+          const input = tr.querySelector("input");
+          input.value = ctx.getAnswer("evlog_"+idx) || "";
+          input.addEventListener("input", ()=>{
+            ctx.setAnswer("evlog_"+idx, input.value);
+            let n=0; CASE2_EVIDENCE_LOG.forEach((_,i2)=>{ if((ctx.getAnswer("evlog_"+i2)||"").trim()) n++; });
+            ctx.awardStars(10, Math.round(n/CASE2_EVIDENCE_LOG.length*3));
+            ctx.refresh();
+          });
+          tbody.appendChild(tr);
+        });
+        stage.appendChild(el(`<div class="card"></div>`)).appendChild(table);
+        footer(stage, s, ctx);
+      }},
+    {id:11, key:"report", label:"Final Detective Report", icon:"🚨", skill:"Writing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · FINAL REPORT", "🚨 Final Detective Report", "Who do you think knows more about the anonymous letters than they're admitting? Use at least three pieces of evidence — 5 to 7 sentences.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem; color:var(--ink-soft);">Need a starting point? Try:<br>
+          <i>I think ______ may know more about the letters because ______. One important piece of evidence is ______. Another clue is ______. The fact that ______ makes me think ______. However, this does not prove ______ because ______. Overall, I think ______.</i></p></div>`));
+        const ta = el(`<textarea placeholder="Write your final detective report here..." style="min-height:170px;"></textarea>`);
+        ta.value = ctx.getAnswer("finalReport")||"";
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("finalReport", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(11, words>=25?2:(words>0?1:0)); ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){ const words = ta.value.trim().split(/\s+/).filter(Boolean).length; ctx.awardStars(11, words>=25?2:1); }
+        stage.appendChild(el(`<div class="card" style="margin-top:16px;"><div class="q-prompt">Do you think Mr. Chen knows who wrote the letters? Why or why not?</div>
+          <textarea id="chenQ" placeholder="Type your answer..."></textarea></div>`));
+        const chenTa = stage.querySelector("#chenQ");
+        chenTa.value = ctx.getAnswer("chenAnswer")||"";
+        chenTa.addEventListener("input", ()=>ctx.setAnswer("chenAnswer", chenTa.value));
+        footer(stage, s, ctx);
+      }},
+    {id:12, key:"journal", label:"Weekly Case Journal (paper)", icon:"📓", skill:"Writing", maxStars:1,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 002 · HOMEWORK", "📓 The Weekly Case Journal", "A real detective keeps investigating after the lesson ends. One page a day this week:");
+        const days = [
+          ["Day 1 — Case Summary", "Write 5–7 sentences summarizing what happened: who, what, where, when, and the important events. Don't include every tiny detail."],
+          ["Day 2 — Three Pieces of Evidence", "For each of 3 clues, write the evidence and what it suggests."],
+          ["Day 3 — Handwriting Challenge", "Pick one paragraph from the case and rewrite it in your best detective handwriting. Circle the sentence you wrote most neatly."],
+          ["Day 4 — Vocabulary", "Choose 5 words from the case. For each: write the word, its meaning, and your own sentence using it."],
+          ["Day 5 — Final Theory", "Write one paragraph (6–8 sentences): who do you think wrote the anonymous letters? Include your theory, three clues, an explanation of each, and one thing you're NOT certain about."]
+        ];
+        days.forEach(([t,d])=>stage.appendChild(el(`<div class="journal-day"><h4>${t}</h4><p>${d}</p></div>`)));
+        buildPaperTask(stage, s, `Print or copy this checklist into the detective notebook to work through across the week.`, "Journal pages are printed / started", ctx, "journalStarted");
+        footer(stage, s, ctx);
+      }},
+    {id:13, key:"closed", label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0,
+      render:(stage, s, ctx)=>{
+        stage.innerHTML="";
+        const name = ctx.getAgent() || "Detective";
+        stage.appendChild(el(`<div class="closed-banner">
+          <div class="stamp-big">TO BE CONTINUED</div>
+          <h2>Great investigating, ${name}!</h2>
+          <p class="stage-sub" style="max-width:560px; margin:10px auto 0;">Mr. Chen is hiding something — but we don't have proof yet. Keep your evidence log growing in the case journal this week. Next lesson, Case #003 opens with new clues.</p></div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
+          <div class="q-prompt">🏅 Achievement unlocked: Evidence Detective</div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
+        const rta = reflect.querySelector("textarea");
+        rta.value = ctx.getAnswer("reflection")||"";
+        rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
+        stage.appendChild(reflect);
+        if(!ctx.isComplete(13)) ctx.markComplete(13);
+      }}
+  ]
+};
+
+const CASES = {"001": CASE1, "002": CASE2};
+
+/* ============================================================
+   ENGINE
+   ============================================================ */
+const SKILL_ORDER = ["Focus","Evidence","Reading","Vocabulary","Spelling","Writing"];
+const STORE_KEY = "detectiveFiles_progress_v2";
+
+function loadProgress(){
+  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return { agent:"", activeCase:"001", data:{} };
+}
+function saveProgress(){ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }
+let progress = loadProgress();
+
+function caseData(caseId){
+  if(!progress.data[caseId]) progress.data[caseId] = { current:0, completed:{}, stars:{}, answers:{} };
+  return progress.data[caseId];
+}
+
+function makeCtx(caseId){
+  const cs = caseData(caseId);
+  return {
+    getAgent: ()=>progress.agent,
+    getAnswer: (k)=>cs.answers[k],
+    setAnswer: (k,v)=>{ cs.answers[k]=v; saveProgress(); },
+    awardStars: (stationId, n)=>{
+      const caseObj = CASES[caseId];
+      const st = caseObj.stations.find(s=>s.id===stationId);
+      cs.stars[stationId] = Math.max(0, Math.min(n, st.maxStars));
+    },
+    isComplete: (id)=>!!cs.completed[id],
+    markComplete: (id)=>{ cs.completed[id]=true; saveProgress(); renderSidebar(); },
+    totalStars: ()=>Object.values(cs.stars).reduce((a,b)=>a+b,0),
+    maxTotalStars: ()=>CASES[caseId].stations.reduce((a,s)=>a+s.maxStars,0),
+    refresh: ()=>{ saveProgress(); renderSidebar(); }
+  };
+}
+
+function isUnlocked(caseId, id){
+  if(id===0) return true;
+  const cs = caseData(caseId);
+  return !!cs.completed[id-1];
+}
+
+function stageHeader(stage, eyebrow, title, sub){
+  stage.appendChild(el(`<div><div class="stage-eyebrow">${eyebrow}</div><h2>${title}</h2><p class="stage-sub">${sub}</p></div>`));
+}
+function footer(stage, s, ctx){
+  const done = ctx.isComplete(s.id);
+  const f = el(`<div class="stage-footer"><span class="status">${done?"✓ Filed away":"Not filed yet"}</span></div>`);
+  const stations = CASES[progress.activeCase].stations;
+  const isLast = s.id === stations.length-2;
+  const btn = el(`<button class="btn primary">${done?"Continue":(isLast?"File Final Report →":"Mark Solved & Continue →")}</button>`);
+  btn.addEventListener("click", ()=>{
+    if(!done) ctx.markComplete(s.id);
+    const nextId = s.id+1;
+    if(nextId < stations.length){
+      caseData(progress.activeCase).current = nextId;
+      saveProgress();
+      render();
+    }
+  });
+  f.appendChild(btn);
+  stage.appendChild(f);
+}
+
+function renderTabs(){
+  const tabs = document.getElementById("caseTabs");
+  tabs.innerHTML = "";
+  Object.values(CASES).forEach(c=>{
+    const active = progress.activeCase===c.id;
+    const tab = el(`<div class="case-tab ${active?"active":""}"><span class="num">${c.tabLabel}</span>${c.tabSub}</div>`);
+    tab.addEventListener("click", ()=>{
+      progress.activeCase = c.id;
+      saveProgress();
+      render();
     });
-    block.appendChild(opts);
-    stage.appendChild(block);
+    tabs.appendChild(tab);
   });
-
-  const morph = document.createElement("div");
-  morph.className = "card";
-  morph.innerHTML = `
-    <div class="q-prompt">🧬 Word Detective: what's the base word in "unusual"?</div>
-    <div class="word-parts"><span>un-</span><span>usual</span><span>= unusual</span></div>
-    <p style="font-size:0.85rem; color:var(--ink-soft);">"un-" flips a word to mean the opposite. Try it yourself: what happens when you add "-ness" to "nervous"?</p>
-    <div class="word-parts"><span>nervous</span><span>+ -ness</span><span>= nervousness</span></div>
-  `;
-  stage.appendChild(morph);
-
-  footer(stage, s);
 }
 
-/* ---- 5: Secret Note (paper task) ---- */
-function renderNote(stage, s){
-  stageHeader(stage, s, "FILE 001 · PAPER EVIDENCE", "✏️ The Secret Note", "This part happens on paper with your tutor — grab a pencil!");
-  const note = document.createElement("div");
-  note.className = "paper-note";
-  note.innerHTML = `
-    <b>📝 Messy note found at the scene:</b><br><br>
-    <i>"i saw evan near the trophy cabinet but he wasnt alone"</i><br><br>
-    Rewrite it correctly on paper — fix the capital letter, the comma, and the apostrophe.
-    Then write these three words neatly, twice each: <b>evidence · suspicious · examined</b>.
-  `;
-  stage.appendChild(note);
-
-  const check = document.createElement("label");
-  check.className = "checkline";
-  check.innerHTML = `<input type="checkbox" id="noteCheck"> I finished the secret note on paper with my tutor`;
-  stage.appendChild(check);
-
-  const cb = check.querySelector("#noteCheck");
-  cb.checked = !!state.answers.noteDone;
-  cb.addEventListener("change", ()=>{
-    state.answers.noteDone = cb.checked;
-    awardStars(5, cb.checked ? 2 : 0);
-    saveState();
-    renderSidebar();
-  });
-  if(cb.checked) awardStars(5,2);
-
-  footer(stage, s);
+function renderHeader(){
+  const c = CASES[progress.activeCase];
+  document.getElementById("hTitle").innerHTML = c.title;
+  document.getElementById("hStamp").textContent = c.stamp;
 }
 
-/* ---- 6: Interrogation (comprehension) ---- */
-function renderInterro(stage, s){
-  stageHeader(stage, s, "FILE 001 · INTERROGATION", "🧠 The Interrogation", "Answer in your own words. Click \"Compare with case notes\" to check your thinking after you write.");
+function renderSidebar(){
+  const caseId = progress.activeCase;
+  const c = CASES[caseId];
+  const ctx = makeCtx(caseId);
+  const cs = caseData(caseId);
 
-  const questions = [
-    {q:"What was missing from the trophy cabinet?", sample:"The Greenwood Science Challenge Trophy."},
-    {q:"What two details made Evan seem suspicious?", sample:"He was near the trophy cabinet, and his box had green paint on it that was still wet."},
-    {q:"Why did Ms. Patel become suspicious when she learned the paint was still wet?", sample:"Because Evan said he painted his volcano yesterday afternoon — so the paint should have dried by Monday morning."},
-    {q:"Is Evan definitely the person who stole the trophy? Explain why or why not.", sample:"No — we can't say for certain. The evidence makes him suspicious, but the story never actually shows him taking the trophy. Suspicious isn't the same as proven."}
-  ];
+  document.getElementById("totalStars").innerHTML = ctx.totalStars() + ` <small>/ ${ctx.maxTotalStars()} stars</small>`;
 
-  let answeredCount = 0;
-  questions.forEach((item, idx)=>{
-    const block = document.createElement("div");
-    block.className = "card q-block";
-    const savedKey = "interro_"+idx;
-    block.innerHTML = `
-      <div class="q-prompt">${idx+1}. ${item.q}</div>
-      <textarea placeholder="Type your answer here...">${state.answers[savedKey]||""}</textarea>
-      <button class="reveal-btn">🔎 Compare with case notes</button>
-      <div class="sample-answer">${item.sample}</div>
-    `;
-    const ta = block.querySelector("textarea");
-    const btn = block.querySelector(".reveal-btn");
-    const sample = block.querySelector(".sample-answer");
-    if(ta.value.trim()) answeredCount++;
-    ta.addEventListener("input", ()=>{
-      state.answers[savedKey] = ta.value;
-      saveState();
-    });
-    btn.addEventListener("click", ()=>{
-      sample.classList.add("show");
-      if(!state.answers[savedKey+"_revealed"]){
-        state.answers[savedKey+"_revealed"] = true;
-        let n=0;
-        questions.forEach((_,i2)=>{ if(state.answers["interro_"+i2+"_revealed"]) n++; });
-        awardStars(6, n);
-        renderSidebar();
-        saveState();
-      }
-    });
-    stage.appendChild(block);
+  const skillMax = {};
+  c.stations.forEach(s=>{ if(s.maxStars>0) skillMax[s.skill]=(skillMax[s.skill]||0)+s.maxStars; });
+
+  const skillRows = document.getElementById("skillRows");
+  skillRows.innerHTML = "";
+  SKILL_ORDER.filter(sk=>skillMax[sk]).forEach(skill=>{
+    const max = skillMax[skill];
+    let got = 0;
+    c.stations.forEach(s=>{ if(s.skill===skill) got += (cs.stars[s.id]||0); });
+    let starsHtml = "";
+    for(let i=0;i<max;i++) starsHtml += i<got ? "★" : `<span class="dim">★</span>`;
+    skillRows.appendChild(el(`<div class="skill-row"><span>${skill}</span><span class="stars">${starsHtml}</span></div>`));
   });
 
-  footer(stage, s);
-}
-
-/* ---- 7: Final Report ---- */
-function renderReport(stage, s){
-  stageHeader(stage, s, "FILE 001 · FINAL REPORT", "🚨 Final Detective Report", "Who do you think is responsible? Use at least two pieces of evidence to support your answer — 3 to 5 sentences.");
-
-  const template = document.createElement("div");
-  template.className = "card";
-  template.innerHTML = `<p style="font-size:0.85rem; color:var(--ink-soft);">Need a starting point? Try:<br>
-  <i>I think ______ is responsible because ______. One piece of evidence is ______. Another clue is ______. This makes me think ______.</i></p>`;
-  stage.appendChild(template);
-
-  const ta = document.createElement("textarea");
-  ta.placeholder = "Write your final detective report here...";
-  ta.value = state.answers.finalReport || "";
-  ta.style.minHeight = "150px";
-  ta.addEventListener("input", ()=>{
-    state.answers.finalReport = ta.value;
-    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
-    awardStars(7, words >= 15 ? 2 : (words>0?1:0));
-    saveState();
-    renderSidebar();
+  const trailList = document.getElementById("trailList");
+  trailList.innerHTML = "";
+  c.stations.forEach(s=>{
+    const done = !!cs.completed[s.id];
+    const unlocked = isUnlocked(caseId, s.id);
+    const active = cs.current === s.id;
+    const li = el(`<li class="trail-item ${done?"done":""} ${active?"active":""} ${!unlocked?"locked":""}">
+      <span class="pin">${done?"✓":(unlocked?s.icon:"🔒")}</span><span class="label">${s.label}</span></li>`);
+    if(unlocked) li.addEventListener("click", ()=>{ cs.current=s.id; saveProgress(); render(); });
+    trailList.appendChild(li);
   });
-  stage.appendChild(ta);
-  if(ta.value){
-    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
-    awardStars(7, words >= 15 ? 2 : 1);
-  }
-
-  footer(stage, s);
 }
 
-/* ---- 8: Case Closed ---- */
-function renderClosed(stage, s){
+function renderStage(){
+  const caseId = progress.activeCase;
+  const c = CASES[caseId];
+  const cs = caseData(caseId);
+  const stage = document.getElementById("stage");
   stage.innerHTML = "";
-  const banner = document.createElement("div");
-  banner.className = "closed-banner";
-  const name = state.agent ? state.agent : "Detective";
-  banner.innerHTML = `
-    <div class="stamp-big">CASE CLOSED</div>
-    <h2>Great work, ${name}!</h2>
-    <p class="stage-sub" style="max-width:520px; margin:10px auto 0;">
-      Actually... we don't have enough evidence to solve the case yet. That's on purpose — a real detective knows when to keep investigating.
-      Next lesson, Case #002 opens with new clues.
-    </p>
-  `;
-  stage.appendChild(banner);
-
-  const card = document.createElement("div");
-  card.className = "card";
-  card.style.maxWidth = "520px";
-  card.style.margin = "0 auto 16px";
-  card.innerHTML = `<div class="q-prompt">🏅 Achievement unlocked: Rookie Detective</div>
-    <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${totalStars()} / ${maxTotalStars()} stars</p>`;
-  stage.appendChild(card);
-
-  const reflect = document.createElement("div");
-  reflect.className = "card";
-  reflect.style.maxWidth = "520px";
-  reflect.style.margin = "0 auto";
-  reflect.innerHTML = `<div class="q-prompt">What was the hardest part today?</div>
-    <textarea placeholder="Type your reflection..."></textarea>`;
-  const rta = reflect.querySelector("textarea");
-  rta.value = state.answers.reflection || "";
-  rta.addEventListener("input", ()=>{
-    state.answers.reflection = rta.value;
-    saveState();
-  });
-  stage.appendChild(reflect);
-
-  if(!state.completed[8]){
-    markComplete(8);
+  const s = c.stations.find(st=>st.id===cs.current);
+  if(!isUnlocked(caseId, s.id)){
+    stage.innerHTML = `<div class="stage-eyebrow">LOCKED FILE</div><h2>🔒 Not yet, detective.</h2><p class="stage-sub">Finish the previous case file first — every clue builds on the last one.</p>`;
+    return;
   }
+  s.render(stage, s, makeCtx(caseId));
 }
 
-/* ============ RENDER ALL ============ */
 function render(){
+  renderTabs();
+  renderHeader();
   renderSidebar();
   renderStage();
 }
+
+const agentInput = document.getElementById("agentName");
+agentInput.value = progress.agent || "";
+agentInput.addEventListener("input", ()=>{ progress.agent = agentInput.value; saveProgress(); });
+
 render();
 </script>
 </body>
