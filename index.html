@@ -185,6 +185,38 @@
   .journal-day{border:2px solid var(--line); border-radius:8px; padding:10px 14px; margin-bottom:10px; background:var(--paper);}
   .journal-day h4{font-size:0.9rem; margin-bottom:4px;}
   .journal-day p{font-size:0.82rem; color:var(--ink-soft); margin:0;}
+
+  .case-tab.trophy-tab{background:#f6e6b8; border-color:var(--ink); margin-left:auto;}
+  .case-tab.trophy-tab.active{background:#f0d281;}
+
+  .lb-summary-card{
+    background:var(--paper); border:2px solid var(--ink); border-radius:10px; padding:12px 14px; margin-bottom:10px;
+  }
+  .lb-summary-card h4{font-size:0.88rem; margin-bottom:4px;}
+  .lb-summary-card .lb-best{font-family:'Fredoka'; font-size:1.4rem; color:var(--mauve-dark);}
+  .lb-summary-card .lb-best small{font-family:'Quicksand'; font-size:0.78rem; color:var(--ink-soft);}
+  .medal{font-size:1rem;}
+
+  .lb-add-form{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;}
+  .lb-add-form label{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-soft); display:block; margin-bottom:3px;}
+  .lb-add-form input, .lb-add-form select{
+    width:100%; font-family:'Quicksand'; font-weight:600; font-size:0.85rem; padding:7px 9px;
+    border:2px solid var(--ink); border-radius:6px; background:var(--paper); color:var(--ink);
+  }
+  .lb-add-form .full{grid-column:1 / -1;}
+  @media(max-width:560px){.lb-add-form{grid-template-columns:1fr;}}
+
+  table.lb-table{width:100%; border-collapse:collapse; font-size:0.85rem;}
+  table.lb-table th{font-family:'Fredoka'; text-align:left; font-size:0.75rem; color:var(--ink-soft); padding:8px; border-bottom:2px solid var(--ink);}
+  table.lb-table td{padding:9px 8px; border-bottom:1px dashed var(--line); vertical-align:middle;}
+  table.lb-table tr:last-child td{border-bottom:none;}
+  .lb-score{font-family:'Fredoka'; font-weight:600;}
+  .lb-remove{
+    background:none; border:none; color:var(--coral); font-size:1rem; cursor:pointer; padding:2px 6px;
+    font-family:'Fredoka';
+  }
+  .lb-empty{color:var(--ink-soft); font-size:0.85rem; font-style:italic; padding:8px 0;}
+
   footer.tag{text-align:center; font-size:0.75rem; color:var(--ink-soft); margin-top:18px; font-family:'Special Elite';}
 </style>
 </head>
@@ -231,13 +263,17 @@ function buildMCQuiz(container, station, questions, ctx){
   questions.forEach((item, idx)=>{
     const block = el(`<div class="q-block card"><div class="q-prompt">${idx+1}. ${item.q}</div></div>`);
     const opts = el(`<div class="opts"></div>`);
+    let fb = null;
+    if(item.why){
+      fb = el(`<div class="feedback"></div>`);
+    }
     item.opts.forEach((label, oi)=>{
       const b = el(`<button class="opt">${label}</button>`);
       b.addEventListener("click", ()=>{
         [...opts.children].forEach(c=>c.disabled=true);
         if(oi===item.correct){ b.classList.add("correct"); correct++; }
         else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
-        if(item.why){
+        if(fb){
           fb.classList.add("show", oi===item.correct?"good":"bad");
           fb.textContent = item.why;
         }
@@ -247,10 +283,7 @@ function buildMCQuiz(container, station, questions, ctx){
       opts.appendChild(b);
     });
     block.appendChild(opts);
-    if(item.why){
-      const fb = el(`<div class="feedback"></div>`);
-      block.appendChild(fb);
-    }
+    if(fb) block.appendChild(fb);
     container.appendChild(block);
   });
 }
@@ -493,7 +526,7 @@ const CASE1 = {
         rta.value = ctx.getAnswer("reflection")||"";
         rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
         stage.appendChild(reflect);
-        if(!ctx.isComplete(8)) ctx.markComplete(8);
+        if(!ctx.isComplete(8)){ ctx.markComplete(8); ctx.logCompletion(); }
       }}
   ]
 };
@@ -707,7 +740,8 @@ const CASE2 = {
         const table = el(`<table class="log"><thead><tr><th>Evidence</th><th>What it might mean</th></tr></thead><tbody></tbody></table>`);
         const tbody = table.querySelector("tbody");
         CASE2_EVIDENCE_LOG.forEach((row, idx)=>{
-          const tr = el(`<tr><td class="ev">${row.ev}</td><td><input type="text" class="line-input" placeholder="Your idea..." /></td></tr>`);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td class="ev">${row.ev}</td><td><input type="text" class="line-input" placeholder="Your idea..." /></td>`;
           const input = tr.querySelector("input");
           input.value = ctx.getAnswer("evlog_"+idx) || "";
           input.addEventListener("input", ()=>{
@@ -772,7 +806,7 @@ const CASE2 = {
         rta.value = ctx.getAnswer("reflection")||"";
         rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
         stage.appendChild(reflect);
-        if(!ctx.isComplete(13)) ctx.markComplete(13);
+        if(!ctx.isComplete(13)){ ctx.markComplete(13); ctx.logCompletion(); }
       }}
   ]
 };
@@ -786,11 +820,24 @@ const SKILL_ORDER = ["Focus","Evidence","Reading","Vocabulary","Spelling","Writi
 const STORE_KEY = "detectiveFiles_progress_v2";
 
 function loadProgress(){
-  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
-  return { agent:"", activeCase:"001", data:{} };
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){
+      const p = JSON.parse(raw);
+      if(!p.log) p.log = [];
+      if(!p.view) p.view = "case";
+      return p;
+    }
+  }catch(e){}
+  // Fresh install: seed the leaderboard with the first in-person session's score.
+  return {
+    agent:"", activeCase:"001", view:"case", data:{},
+    log:[{ id: "seed-1", when:"Session 1", caseId:"001", caseLabel:"Missing Trophy", stars:24, max:24, note:"Perfect score!", source:"manual" }]
+  };
 }
 function saveProgress(){ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }
 let progress = loadProgress();
+let lbEntrySeq = 1;
 
 function caseData(caseId){
   if(!progress.data[caseId]) progress.data[caseId] = { current:0, completed:{}, stars:{}, answers:{} };
@@ -812,7 +859,18 @@ function makeCtx(caseId){
     markComplete: (id)=>{ cs.completed[id]=true; saveProgress(); renderSidebar(); },
     totalStars: ()=>Object.values(cs.stars).reduce((a,b)=>a+b,0),
     maxTotalStars: ()=>CASES[caseId].stations.reduce((a,s)=>a+s.maxStars,0),
-    refresh: ()=>{ saveProgress(); renderSidebar(); }
+    refresh: ()=>{ saveProgress(); renderSidebar(); },
+    logCompletion: ()=>{
+      const caseObj = CASES[caseId];
+      const stars = Object.values(cs.stars).reduce((a,b)=>a+b,0);
+      const max = caseObj.stations.reduce((a,s)=>a+s.maxStars,0);
+      progress.log.push({
+        id: "auto-"+caseId+"-"+Date.now()+"-"+(lbEntrySeq++),
+        when: new Date().toLocaleDateString(undefined,{month:"short", day:"numeric", year:"numeric"}),
+        caseId, caseLabel: caseObj.tabSub, stars, max, note:"", source:"auto"
+      });
+      saveProgress();
+    }
   };
 }
 
@@ -848,15 +906,24 @@ function renderTabs(){
   const tabs = document.getElementById("caseTabs");
   tabs.innerHTML = "";
   Object.values(CASES).forEach(c=>{
-    const active = progress.activeCase===c.id;
+    const active = progress.view==="case" && progress.activeCase===c.id;
     const tab = el(`<div class="case-tab ${active?"active":""}"><span class="num">${c.tabLabel}</span>${c.tabSub}</div>`);
     tab.addEventListener("click", ()=>{
+      progress.view = "case";
       progress.activeCase = c.id;
       saveProgress();
       render();
     });
     tabs.appendChild(tab);
   });
+  const lbActive = progress.view==="leaderboard";
+  const lbTab = el(`<div class="case-tab trophy-tab ${lbActive?"active":""}"><span class="num">🏆 Hall of Fame</span>Leaderboard</div>`);
+  lbTab.addEventListener("click", ()=>{
+    progress.view = "leaderboard";
+    saveProgress();
+    render();
+  });
+  tabs.appendChild(lbTab);
 }
 
 function renderHeader(){
@@ -871,6 +938,8 @@ function renderSidebar(){
   const ctx = makeCtx(caseId);
   const cs = caseData(caseId);
 
+  document.querySelector(".scoreboard h3").textContent = "⭐ Detective Score";
+  document.querySelector(".trail h3").textContent = "🗺️ Case Trail";
   document.getElementById("totalStars").innerHTML = ctx.totalStars() + ` <small>/ ${ctx.maxTotalStars()} stars</small>`;
 
   const skillMax = {};
@@ -914,11 +983,136 @@ function renderStage(){
   s.render(stage, s, makeCtx(caseId));
 }
 
+/* ============================================================
+   LEADERBOARD PAGE
+   ============================================================ */
+function renderLeaderboardHeader(){
+  document.getElementById("hTitle").innerHTML = "The <span>Hall of Fame</span>";
+  document.getElementById("hStamp").textContent = "TOP DETECTIVE";
+}
+
+function medalFor(stars, max){
+  if(max>0 && stars===max) return "🏅";
+  if(max>0 && stars/max >= 0.75) return "⭐";
+  return "🔎";
+}
+
+function renderLeaderboardSidebar(){
+  document.querySelector(".scoreboard h3").textContent = "🏆 Sessions Logged";
+  document.getElementById("totalStars").innerHTML =
+    progress.log.length + ` <small>${progress.log.length===1?"session logged":"sessions logged"}</small>`;
+
+  const skillRows = document.getElementById("skillRows");
+  skillRows.innerHTML = "";
+  Object.values(CASES).forEach(c=>{
+    const entries = progress.log.filter(e=>e.caseId===c.id);
+    const best = entries.reduce((m,e)=> e.stars>m ? e.stars : m, 0);
+    const bestMax = entries.length ? entries.find(e=>e.stars===best).max : c.stations.reduce((a,s)=>a+s.maxStars,0);
+    skillRows.appendChild(el(`<div class="lb-summary-card">
+      <h4>${c.tabLabel} · ${c.tabSub}</h4>
+      <div class="lb-best">${entries.length? best : "—"} <small>/ ${bestMax} best${entries.length? " · "+medalFor(best,bestMax):""}</small></div>
+    </div>`));
+  });
+
+  const trailList = document.getElementById("trailList");
+  trailList.innerHTML = "";
+  trailList.parentElement.querySelector("h3").textContent = "🏆 Achievements";
+  const perfectCases = Object.values(CASES).filter(c=>progress.log.some(e=>e.caseId===c.id && e.max>0 && e.stars===e.max));
+  if(perfectCases.length===0){
+    trailList.appendChild(el(`<li style="list-style:none; padding:6px 0; font-size:0.82rem; color:var(--ink-soft);">No perfect scores yet — keep investigating!</li>`));
+  } else {
+    perfectCases.forEach(c=>{
+      trailList.appendChild(el(`<li style="list-style:none; padding:6px 0; font-size:0.82rem; font-weight:700;">🏅 ${c.tabSub} — solved perfectly</li>`));
+    });
+  }
+}
+
+function renderLeaderboardStage(){
+  const stage = document.getElementById("stage");
+  stage.innerHTML = "";
+  stage.appendChild(el(`<div><div class="stage-eyebrow">HALL OF FAME</div><h2>🏆 The Leaderboard</h2><p class="stage-sub">Every case attempt, filed for the record. Add a session by hand for anything solved on paper.</p></div>`));
+
+  const formCard = el(`<div class="card">
+    <div class="q-prompt">➕ Log a session</div>
+    <div class="lb-add-form">
+      <div><label>When</label><input type="text" id="lbWhen" placeholder="e.g. Sept 21, or Session 3" /></div>
+      <div><label>Case</label>
+        <select id="lbCase">
+          ${Object.values(CASES).map(c=>`<option value="${c.id}">${c.tabLabel} — ${c.tabSub}</option>`).join("")}
+          <option value="other">Other / paper case</option>
+        </select>
+      </div>
+      <div><label>Stars earned</label><input type="text" id="lbStars" placeholder="e.g. 24" /></div>
+      <div><label>Stars possible</label><input type="text" id="lbMax" placeholder="e.g. 24" /></div>
+      <div class="full"><label>Note (optional)</label><input type="text" id="lbNote" placeholder="e.g. great focus today!" /></div>
+    </div>
+    <button class="btn mint" id="lbAddBtn">Add to leaderboard</button>
+  </div>`);
+  stage.appendChild(formCard);
+
+  formCard.querySelector("#lbAddBtn").addEventListener("click", ()=>{
+    const whenEl = formCard.querySelector("#lbWhen");
+    const caseEl = formCard.querySelector("#lbCase");
+    const starsEl = formCard.querySelector("#lbStars");
+    const maxEl = formCard.querySelector("#lbMax");
+    const noteEl = formCard.querySelector("#lbNote");
+    const stars = parseInt(starsEl.value, 10);
+    const max = parseInt(maxEl.value, 10);
+    if(isNaN(stars) || isNaN(max) || max<=0){
+      starsEl.style.borderColor = "var(--coral)";
+      maxEl.style.borderColor = "var(--coral)";
+      return;
+    }
+    const caseId = caseEl.value;
+    const caseLabel = caseId==="other" ? "Paper case" : CASES[caseId].tabSub;
+    progress.log.push({
+      id: "manual-"+Date.now()+"-"+(lbEntrySeq++),
+      when: whenEl.value.trim() || "Undated",
+      caseId, caseLabel, stars, max, note: noteEl.value.trim(), source:"manual"
+    });
+    saveProgress();
+    render();
+  });
+
+  const listCard = el(`<div class="card"></div>`);
+  if(progress.log.length===0){
+    listCard.appendChild(el(`<div class="lb-empty">No sessions logged yet.</div>`));
+  } else {
+    const sorted = [...progress.log].sort((a,b)=> (b.id||"").localeCompare(a.id||""));
+    const table = el(`<table class="lb-table"><thead><tr><th>When</th><th>Case</th><th>Score</th><th>Note</th><th></th></tr></thead><tbody></tbody></table>`);
+    const tbody = table.querySelector("tbody");
+    sorted.forEach(entry=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${entry.when}</td>
+        <td>${entry.caseLabel}</td>
+        <td class="lb-score">${medalFor(entry.stars, entry.max)} ${entry.stars}/${entry.max}</td>
+        <td style="color:var(--ink-soft); font-size:0.82rem;">${entry.note||""}</td>
+        <td><button class="lb-remove" title="Remove entry">✕</button></td>
+      `;
+      tr.querySelector(".lb-remove").addEventListener("click", ()=>{
+        progress.log = progress.log.filter(e=>e.id!==entry.id);
+        saveProgress();
+        render();
+      });
+      tbody.appendChild(tr);
+    });
+    listCard.appendChild(table);
+  }
+  stage.appendChild(listCard);
+}
+
 function render(){
   renderTabs();
-  renderHeader();
-  renderSidebar();
-  renderStage();
+  if(progress.view === "leaderboard"){
+    renderLeaderboardHeader();
+    renderLeaderboardSidebar();
+    renderLeaderboardStage();
+  } else {
+    renderHeader();
+    renderSidebar();
+    renderStage();
+  }
 }
 
 const agentInput = document.getElementById("agentName");
