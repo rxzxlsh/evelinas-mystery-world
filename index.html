@@ -288,11 +288,13 @@ function buildMCQuiz(container, station, questions, ctx){
   });
 }
 
-function buildFreeResponse(container, station, items, ctx, keyPrefix){
+function buildFreeResponse(container, station, items, ctx, keyPrefix, groups){
+  groups = groups || [[keyPrefix, items.length]];
   items.forEach((item, idx)=>{
     const savedKey = keyPrefix+"_"+idx;
     const block = el(`
       <div class="card q-block">
+        ${item.intro ? `<div class="card story" style="margin-bottom:12px;"><p>${item.intro}</p></div>` : ""}
         <div class="q-prompt">${idx+1}. ${item.q}</div>
         <textarea placeholder="Type your answer here...">${ctx.getAnswer(savedKey)||""}</textarea>
         <button class="reveal-btn">🔎 Compare with case notes</button>
@@ -306,9 +308,9 @@ function buildFreeResponse(container, station, items, ctx, keyPrefix){
       sample.classList.add("show");
       if(!ctx.getAnswer(savedKey+"_revealed")){
         ctx.setAnswer(savedKey+"_revealed", true);
-        let n=0;
-        items.forEach((_,i2)=>{ if(ctx.getAnswer(keyPrefix+"_"+i2+"_revealed")) n++; });
-        ctx.awardStars(station.id, Math.round(n/items.length*station.maxStars));
+        let n=0, total=0;
+        groups.forEach(([p,len])=>{ total+=len; for(let i=0;i<len;i++){ if(ctx.getAnswer(p+"_"+i+"_revealed")) n++; } });
+        ctx.awardStars(station.id, Math.round(n/total*station.maxStars));
         ctx.refresh();
       }
     });
@@ -706,8 +708,8 @@ const CASE2 = {
       render:(stage, s, ctx)=>{
         stageHeader(stage, "FILE 002 · INTERROGATION", "🧠 The Interrogation", "First the basics, then the harder inference questions. Remember — more than one inference can be reasonable, as long as you explain your thinking.");
         const wrap = el(`<div></div>`);
-        buildFreeResponse(wrap, s, CASE2_BASIC_Q, ctx, "c2_basic");
-        buildFreeResponse(wrap, s, CASE2_INFER_Q, ctx, "c2_infer");
+        buildFreeResponse(wrap, s, CASE2_BASIC_Q, ctx, "c2_basic", [["c2_basic",6],["c2_infer",4]]);
+        buildFreeResponse(wrap, s, CASE2_INFER_Q, ctx, "c2_infer", [["c2_basic",6],["c2_infer",4]]);
         stage.appendChild(wrap);
         footer(stage, s, ctx);
       }},
@@ -801,6 +803,19 @@ const CASE2 = {
         stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
           <div class="q-prompt">🏅 Achievement unlocked: Evidence Detective</div>
           <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const revealBox2 = el(`<div style="max-width:560px; margin:0 auto 16px; text-align:center;"></div>`);
+        const revealBtn2 = el(`<button class="btn primary">🔓 Tutor only: reveal the solution (next lesson)</button>`);
+        revealBtn2.addEventListener("click", ()=>{
+          revealBtn2.remove();
+          revealBox2.appendChild(el(`<div class="card story" style="text-align:left;">
+            <p><b>🔐 Solution:</b> Mr. Chen wrote both anonymous letters.</p>
+            <p>He had noticed that someone was taking small items from students' desks, but he didn't want to accuse anyone without proof — so he wrote the first letter anonymously and pointed Ms. Rivera toward the library. The second letter (YOU'RE LOOKING IN THE WRONG PLACE) was meant to nudge her toward realizing the library itself was connected somehow.</p>
+            <p>So there are actually two mysteries here. <b>Who wrote the letters?</b> Mr. Chen. <b>Who was actually stealing the items?</b> Still unknown — that one stays open.</p>
+            <p><b>You were right that Mr. Chen was hiding something... but you were wrong about what he was hiding.</b> Being suspicious doesn't always mean being guilty of the crime you first suspected.</p>
+          </div>`));
+        });
+        revealBox2.appendChild(revealBtn2);
+        stage.appendChild(revealBox2);
         const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
         const rta = reflect.querySelector("textarea");
         rta.value = ctx.getAnswer("reflection")||"";
@@ -811,12 +826,373 @@ const CASE2 = {
   ]
 };
 
-const CASES = {"001": CASE1, "002": CASE2};
+/* ============================================================
+   CASE #003 — THE VANISHING PUPPY
+   ============================================================ */
+function makeSeqQ(idx, a, b, c, correct){
+  const perms = ["A → B → C","A → C → B","B → A → C","B → C → A","C → A → B","C → B → A"];
+  const distractors = perms.filter(p=>p!==correct);
+  const opts = [distractors[idx % 5], distractors[(idx+2) % 5]];
+  const pos = idx % 3;
+  opts.splice(pos, 0, correct);
+  return {q:"Put these events in order:<br>A. "+a+"<br>B. "+b+"<br>C. "+c, opts:opts, correct:pos};
+}
+const CASE3_SEQ_DATA = [
+  ["She opened the door.","She heard a knock.","She walked downstairs.","B → C → A"],
+  ["The cake went into the oven.","Maya mixed the ingredients.","Maya gathered the ingredients.","C → B → A"],
+  ["Liam handed in his test.","Liam answered the questions.","Liam read the instructions.","C → B → A"],
+  ["The dog jumped into the car.","The family opened the car door.","The family arrived at the park.","B → A → C"],
+  ["Sara brushed her teeth.","Sara woke up.","Sara went to school.","B → A → C"],
+  ["The detective interviewed the witness.","The detective found the clue.","The detective arrived at the scene.","C → A → B"],
+  ["The student submitted the assignment.","The student finished writing.","The student opened the document.","C → B → A"],
+  ["The plant grew taller.","The seed was planted.","The seed began to sprout.","B → C → A"],
+  ["The rain stopped.","The storm began.","The clouds became dark.","C → B → A"],
+  ["The detective discovered the truth.","The detective collected evidence.","The detective formed a theory.","B → C → A"]
+];
+const CASE3_SEQ_Q = CASE3_SEQ_DATA.map((d,i)=>makeSeqQ(i,d[0],d[1],d[2],d[3]));
+
+const CASE3_SUMMARY_ITEMS = [
+  {intro:"Liam forgot his science project at home. He realized it when he arrived at school. He called his mom, and she brought it to school before his class started.",
+   q:"What happened first?", sample:"Liam forgot his project at home."},
+  {q:"(Same story) What happened next?", sample:"He realized it when he got to school."},
+  {q:"(Same story) What happened finally?", sample:"His mom brought the project to school."},
+  {q:"(Same story) Write a one-sentence summary.", sample:"Liam forgot his science project, but his mom brought it to school before class."},
+  {intro:"Emma was walking home when she noticed a wallet on the sidewalk. She picked it up and looked inside. There was an ID card with the owner's name. Emma brought the wallet to the nearby police station so it could be returned.",
+   q:"Summarize this story in one sentence.", sample:"Emma found a wallet and brought it to the police station so it could be returned to its owner."},
+  {intro:"Noah's class was supposed to have a soccer game outside, but it started raining. Their teacher moved the activity into the gym. The students played basketball instead.",
+   q:"Summarize this story in one sentence.", sample:"Because it rained, Noah's class moved their outdoor soccer game into the gym and played basketball instead."}
+];
+
+const CASE3_STORY = [
+  "It was Saturday afternoon when Maya and her older brother, Daniel, were playing in their backyard.",
+  "Their family had recently adopted a small golden retriever puppy named Biscuit. Biscuit was energetic and loved running around the yard.",
+  "At around 2:00 PM, Maya went inside to get a glass of water. Before she went inside, she closed the backyard gate. Daniel stayed outside with Biscuit.",
+  "A few minutes later, Daniel heard the sound of a delivery truck driving down the street. He turned toward the road for only a moment. When he looked back, Biscuit was gone.",
+  "Daniel searched behind the shed, underneath the patio table, and around the garden. Nothing. He ran inside and called Maya. \"Biscuit disappeared!\"",
+  "Maya rushed outside. The backyard gate was open. \"I know I closed that,\" she said. Daniel looked confused. \"I didn't open it.\"",
+  "The two siblings began searching the neighbourhood. They first checked the park across the street. Then they walked toward the corner store. Finally, they returned home.",
+  "At approximately 3:00 PM, Maya noticed something unusual beside the backyard gate. There was a small muddy paw print. Beside it was a red piece of fabric. Maya picked it up. \"This isn't from Biscuit's collar,\" she said.",
+  "Daniel looked at it carefully. \"Wait.\" He pointed toward the sidewalk. There were several more muddy paw prints. They continued down the sidewalk. The footprints eventually disappeared near the park.",
+  "Maya looked toward the park. \"Maybe Biscuit went this way.\" But Daniel wasn't convinced. \"If he ran to the park, why would he leave his collar behind?\"",
+  "Maya looked down. She suddenly realized something. Biscuit wasn't wearing his collar. Someone had removed it."
+];
+const CASE3_EVIDENCE = [
+  {ev:"Gate was open", hint:"Someone may have opened it, or it may not have been latched — either way, Biscuit had a way out."},
+  {ev:"Daniel heard a truck", hint:"It pulled his attention away right before Biscuit disappeared."},
+  {ev:"Muddy paw prints", hint:"Biscuit may have left the yard — but we can't be sure the prints are his."},
+  {ev:"Red fabric", hint:"Unclear. It could be connected, or it could have nothing to do with Biscuit."},
+  {ev:"Collar was missing", hint:"It may have come off or been taken off — we can't tell yet."},
+  {ev:"Paw prints led toward the park", hint:"Biscuit may have gone that way, but the prints disappearing doesn't prove where he ended up."}
+];
+const CASE3_BASIC_Q = [
+  {q:"Who was with Biscuit before he disappeared?", sample:"Daniel."},
+  {q:"What happened immediately before Biscuit disappeared?", sample:"Daniel heard a delivery truck and looked toward the road."},
+  {q:"What did Daniel do after noticing Biscuit was gone?", sample:"He searched the backyard (behind the shed, under the patio table, around the garden), then ran inside and called Maya."},
+  {q:"What did Maya notice when she came outside?", sample:"The backyard gate was open."},
+  {q:"What evidence suggested Biscuit had left the yard?", sample:"The muddy paw prints."},
+  {q:"Where did the paw prints eventually lead?", sample:"Toward the park."},
+  {q:"What unusual object did Maya find?", sample:"A red piece of fabric."},
+  {q:"Why is the missing collar important?", sample:"Because Biscuit wasn't wearing it, which suggests someone may have removed it — or it may have come off some other way."}
+];
+const CASE3_INFER_Q = [
+  {q:"Do we know for certain that Biscuit ran to the park?", sample:"No."},
+  {q:"Why might the paw prints not prove that Biscuit went there?", sample:"Because we don't know for sure that the paw prints belonged to Biscuit."},
+  {q:"What could the red fabric mean?", sample:"Someone wearing red may have been involved, it could have caught on the gate, or it might have nothing to do with Biscuit. More than one reasonable idea is fine if you explain why."},
+  {q:"Why is the delivery truck important?", sample:"Because Daniel was distracted by it right before Biscuit disappeared."},
+  {q:"Does that prove the delivery driver took Biscuit? What would we need before we could say that?", sample:"No! We'd need something like a witness who saw it, camera footage, or evidence connecting the driver to the puppy."}
+];
+const CASE3_VOCAB_Q = [
+  {q:'<b>energetic</b> — "Biscuit was energetic and loved running around the yard."', opts:["Full of energy","Very sleepy","Hungry","Afraid"], correct:0},
+  {q:'<b>approximately</b> — "At approximately 3:00 PM, Maya noticed something unusual beside the backyard gate."', opts:["Exactly","Never","About or roughly","Early"], correct:2},
+  {q:'<b>unusual</b> — "Maya noticed something unusual beside the backyard gate."', opts:["Ordinary","Strange or uncommon","Enormous","Dangerous"], correct:1},
+  {q:'<b>eventually</b> — "The footprints eventually disappeared near the park."', opts:["Suddenly","Twice","Never","In the end, after some time"], correct:3},
+  {q:'<b>convinced</b> — "But Daniel wasn\'t convinced." (Daniel wasn\'t sure Biscuit had really gone to the park.)', opts:["Angry","Certain or persuaded that something is true","Late","Sleepy"], correct:1},
+  {q:'<b>disappeared</b> — "\'Biscuit disappeared!\'"', opts:["Grew bigger","Was found","Went missing","Woke up"], correct:2},
+  {q:'<b>collar</b> — "If he ran to the park, why would he leave his collar behind?"', opts:["A kind of fabric","A band worn around an animal\'s neck","A gate latch","A toy"], correct:1},
+  {q:'<b>distracted</b> — Daniel heard a delivery truck and turned toward the road for a moment. He was <i>distracted</i>. What does it mean?', opts:["Unable to focus because attention was pulled somewhere else","Very tired","Extremely happy","Lost"], correct:0},
+  {q:'🧬 <b>unusual</b> = un + usual. What does un- do?', opts:["Means again","Makes it mean the opposite (not usual)","Means full of"], correct:1},
+  {q:'🧬 <b>disappeared</b> = dis + appear + ed. What does dis- suggest?', opts:["More of it","Before it","The opposite of appearing"], correct:2},
+  {q:'🧬 <b>reread</b> — which part gives you a clue?', opts:["re- means again","re- means not","re- means without"], correct:0},
+  {q:'🧬 <b>careless</b> — what does -less mean?', opts:["Full of","Without","Again"], correct:1}
+];
+
+const CASE3 = {
+  id:"003", tabLabel:"Case #003", tabSub:"Vanishing Puppy",
+  title:'Case #003: The <span>Vanishing Puppy</span>', stamp:"OPEN CASE",
+  stations:[
+    {id:0, key:"briefing", label:"The Briefing", icon:"📋", skill:"Focus", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · BRIEFING", "📋 The Briefing", "A puppy has disappeared, detective.");
+        stage.appendChild(el(`<div class="card">
+          <p>A puppy disappeared from a family's backyard yesterday afternoon. Everyone remembers something different.</p>
+          <p style="margin-top:8px;">Your job isn't just to figure out where the puppy went. <b>You need to reconstruct exactly what happened, in the correct order.</b></p>
+          <p style="margin-top:8px; color:var(--ink-soft); font-size:0.85rem;">Quick thought: if something happened at 3:00 and then something happened at 2:00 — is that a good timeline? Today you'll learn how detectives build one.</p>
+        </div>`));
+        ctx.awardStars(0,2);
+        footer(stage, s, ctx);
+      }},
+    {id:1, key:"sequencing", label:"Sequencing", icon:"🧩", skill:"Sequencing", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · SEQUENCING", "🧩 What is Sequencing?", "Sequencing = putting events in the order that they happened.");
+        stage.appendChild(el(`<div class="card">
+          <p><b>Beginning:</b> first, initially, at the beginning, before</p>
+          <p style="margin-top:6px;"><b>Middle:</b> next, then, afterward, later, meanwhile</p>
+          <p style="margin-top:6px;"><b>End:</b> finally, eventually, in the end, after that</p>
+          <p style="margin-top:10px; font-size:0.85rem; color:var(--ink-soft);">Example — these are out of order: (1) I put my shoes on. (2) I woke up. (3) I went downstairs. (4) I ate breakfast. The right order is: <i>First</i>, I woke up. <i>Next</i>, I put my shoes on. <i>Then</i>, I went downstairs. <i>Finally</i>, I ate breakfast.</p>
+          <p style="margin-top:8px; font-size:0.85rem;">Why does order matter? If a story gives events in the wrong order, we might misunderstand what happened — or blame the wrong person.</p>
+        </div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE3_SEQ_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:2, key:"summary_lesson", label:"Summarizing", icon:"🍕", skill:"Summarizing", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · SUMMARIZING", "🍕 What is a Summary?", "A summary tells the most important parts of a text in your own words.");
+        stage.appendChild(el(`<div class="card">
+          <p><span class="clue-tag">RULE 1</span> Shorter than the original.</p>
+          <p style="margin-top:6px;"><span class="clue-tag">RULE 2</span> Only the important information.</p>
+          <p style="margin-top:6px;"><span class="clue-tag">RULE 3</span> Your own words — don't just copy sentences.</p>
+          <p style="margin-top:10px; font-size:0.85rem; color:var(--ink-soft);">🍕 The Pizza Test: the whole story is a giant pizza. The important information is the pizza itself; tiny details are toppings; a summary is a smaller slice with the most important parts. (Tip: a detail that seems unimportant at first can turn out to matter later — that's mysteries for you!)</p>
+          <p style="margin-top:8px; font-size:0.85rem;">A good summary answers: <b>Who? What happened? Why does it matter?</b></p>
+        </div>`));
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE3_SUMMARY_ITEMS, ctx, "c3_summary");
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:3, key:"timeline_paper", label:"The Timeline (paper)", icon:"✒️", skill:"Spelling", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · PAPER EVIDENCE", "✒️ The Timeline", "Handwriting + sequencing together — grab a pencil!");
+        buildPaperTask(stage, s, `<b>Here are five events, all jumbled:</b><br><br>
+          • The puppy disappeared.<br>• Maya went outside.<br>• The gate was discovered open.<br>• Maya called her brother.<br>• They searched the backyard.<br><br>
+          1. Number them.<br>2. Rewrite them in chronological order.<br>3. Add sequencing words (first, next, then, after that, finally) and write them neatly.`,
+          "I finished the timeline on paper with my tutor", ctx, "timelineDone");
+        footer(stage, s, ctx);
+      }},
+    {id:4, key:"story", label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · THE CASE", "📖 The Vanishing Puppy", "Take turns reading aloud with your tutor — then stop when the story does.");
+        stage.appendChild(el(`<div class="card story">${CASE3_STORY.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        stage.appendChild(el(`<div class="card"><div class="q-prompt">🛑 Stop right there.</div><p style="font-size:0.88rem;">What do you think happened? Say your theory out loud — but remember: detectives don't get theories without evidence.</p></div>`));
+        ctx.awardStars(4,2);
+        footer(stage, s, ctx);
+      }},
+    {id:5, key:"evidence", label:"The Evidence Board", icon:"🗂️", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · EVIDENCE", "🗂️ The Evidence Board", "For each clue, write what it tells us. Don't rush — and it's okay to say \"we can't be sure yet.\"");
+        const table = el(`<table class="log"><thead><tr><th>Evidence</th><th>What does it tell us?</th></tr></thead><tbody></tbody></table>`);
+        const tbody = table.querySelector("tbody");
+        CASE3_EVIDENCE.forEach((row, idx)=>{
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td class="ev">${row.ev}</td><td><input type="text" class="line-input" placeholder="Your idea..." /></td>`;
+          const input = tr.querySelector("input");
+          input.value = ctx.getAnswer("c3_ev_"+idx) || "";
+          input.addEventListener("input", ()=>{
+            ctx.setAnswer("c3_ev_"+idx, input.value);
+            let n=0; CASE3_EVIDENCE.forEach((_,i2)=>{ if((ctx.getAnswer("c3_ev_"+i2)||"").trim()) n++; });
+            ctx.awardStars(5, Math.round(n/CASE3_EVIDENCE.length*3));
+            ctx.refresh();
+          });
+          tbody.appendChild(tr);
+        });
+        const card = el(`<div class="card"></div>`);
+        card.appendChild(table);
+        stage.appendChild(card);
+        const btn = el(`<button class="reveal-btn">🔎 Compare with case notes</button>`);
+        const notes = el(`<div class="sample-answer">${CASE3_EVIDENCE.map(r=>`<b>${r.ev}:</b> ${r.hint}`).join("<br><br>")}</div>`);
+        btn.addEventListener("click", ()=>notes.classList.add("show"));
+        stage.appendChild(btn);
+        stage.appendChild(notes);
+        footer(stage, s, ctx);
+      }},
+    {id:6, key:"interro", label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · INTERROGATION", "🧠 The Interrogation", "First the basics, then the harder inference questions.");
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE3_BASIC_Q.concat(CASE3_INFER_Q), ctx, "c3_q");
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:7, key:"sequence_case", label:"Sequence the Case", icon:"⏱️", skill:"Sequencing", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · TIMELINE", "⏱️ Sequence the Actual Case", "These events are out of order. Click them in the order they really happened.");
+        const events = [
+          {id:"A", t:"Maya found muddy paw prints."},
+          {id:"B", t:"Daniel heard a delivery truck."},
+          {id:"C", t:"Maya went inside for water."},
+          {id:"D", t:"Biscuit disappeared."},
+          {id:"E", t:"Maya and Daniel searched the neighbourhood."},
+          {id:"F", t:"They discovered that Biscuit wasn't wearing his collar."},
+          {id:"G", t:"Daniel searched the backyard."}
+        ];
+        const correctOrder = ["C","B","D","G","E","A","F"];
+        let picked = [];
+        const orderCard = el(`<div class="card"><div class="opts"></div><div class="feedback"></div></div>`);
+        const optsEl = orderCard.querySelector(".opts");
+        const fb = orderCard.querySelector(".feedback");
+        const btns = {};
+        function updateStars(){
+          const orderStars = ctx.getAnswer("c3_orderStars") || 0;
+          const words = (ctx.getAnswer("c3_seqPara")||"").trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(7, orderStars + (words>=20 ? 1 : 0));
+          ctx.refresh();
+        }
+        events.forEach(e=>{
+          const b = el(`<button class="opt">${e.id}. ${e.t}</button>`);
+          b.addEventListener("click", ()=>{
+            if(picked.includes(e.id)) return;
+            picked.push(e.id);
+            b.textContent = "("+picked.length+") "+e.id+". "+e.t;
+            b.disabled = true;
+            if(picked.length===events.length) checkBtn.disabled = false;
+          });
+          btns[e.id]=b;
+          optsEl.appendChild(b);
+        });
+        const controls = el(`<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;"></div>`);
+        const checkBtn = el(`<button class="btn mint">Check my order</button>`);
+        checkBtn.disabled = true;
+        const resetBtn = el(`<button class="btn">Start over</button>`);
+        checkBtn.addEventListener("click", ()=>{
+          let right = 0;
+          picked.forEach((id,i)=>{
+            const isRight = id===correctOrder[i];
+            if(isRight) right++;
+            btns[id].classList.add(isRight?"correct":"wrong");
+          });
+          fb.classList.add("show");
+          if(right===correctOrder.length){
+            fb.className = "feedback show good";
+            fb.textContent = "Perfect timeline! C → B → D → G → E → A → F.";
+            ctx.setAnswer("c3_orderStars", 2);
+          } else {
+            fb.className = "feedback show bad";
+            fb.textContent = right+" of "+correctOrder.length+" in the right spot. Green ones are in the right place — try again!";
+            ctx.setAnswer("c3_orderStars", right>=5 ? 1 : 0);
+          }
+          updateStars();
+        });
+        resetBtn.addEventListener("click", ()=>{
+          picked = [];
+          events.forEach(e=>{ btns[e.id].disabled=false; btns[e.id].className="opt"; btns[e.id].textContent = e.id+". "+e.t; });
+          fb.className = "feedback"; fb.textContent="";
+          checkBtn.disabled = true;
+        });
+        controls.appendChild(checkBtn); controls.appendChild(resetBtn);
+        orderCard.appendChild(controls);
+        stage.appendChild(orderCard);
+
+        const paraCard = el(`<div class="card"><div class="q-prompt">Now rewrite the sequence as a paragraph, using sequencing words (first, next, when he looked back, afterward, later, finally).</div><textarea placeholder="Write your paragraph here..."></textarea>
+          <button class="reveal-btn">🔎 Compare with model</button>
+          <div class="sample-answer"><b>First</b>, Maya went inside to get water while Daniel stayed outside with Biscuit. <b>Next</b>, Daniel heard a delivery truck and looked toward the road. <b>When he looked back</b>, Biscuit was gone. <b>Afterward</b>, Daniel searched the backyard and then called Maya. <b>Later</b>, they searched the neighbourhood and discovered muddy paw prints. <b>Finally</b>, they realized Biscuit's collar was missing.</div></div>`);
+        const ta = paraCard.querySelector("textarea");
+        ta.value = ctx.getAnswer("c3_seqPara")||"";
+        ta.addEventListener("input", ()=>{ ctx.setAnswer("c3_seqPara", ta.value); updateStars(); });
+        paraCard.querySelector(".reveal-btn").addEventListener("click", ()=>paraCard.querySelector(".sample-answer").classList.add("show"));
+        stage.appendChild(paraCard);
+        footer(stage, s, ctx);
+      }},
+    {id:8, key:"vocab", label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · VOCABULARY", "🔤 Vocabulary Detective", "Use the sentence around each word to figure out its meaning. Then look inside some words — prefixes and suffixes are clues too.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE3_VOCAB_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:9, key:"summary_challenge", label:"Summary Challenge", icon:"✍️", skill:"Summarizing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · SUMMARY CHALLENGE", "✍️ The Official Case Summary", "Write the official summary of the case: 5–7 sentences.");
+        stage.appendChild(el(`<div class="card">
+          <p><b>Must include:</b> ☑ Who &nbsp; ☑ What happened &nbsp; ☑ Important events in order &nbsp; ☑ Important evidence &nbsp; ☑ The current mystery</p>
+          <p style="margin-top:10px; font-size:0.85rem; color:var(--ink-soft);"><i>On Saturday afternoon, ______. First, ______. Then, ______. After that, ______. The detectives discovered ______. This is important because ______. The case remains unsolved because ______.</i></p>
+        </div>`));
+        const ta = el(`<textarea placeholder="Write your case summary here..." style="min-height:150px;"></textarea>`);
+        ta.value = ctx.getAnswer("c3_summaryChallenge")||"";
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("c3_summaryChallenge", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(9, words>=25?2:(words>0?1:0)); ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){ const words = ta.value.trim().split(/\s+/).filter(Boolean).length; ctx.awardStars(9, words>=25?2:1); }
+        footer(stage, s, ctx);
+      }},
+    {id:10, key:"theory", label:"Final Detective Theory", icon:"🚨", skill:"Writing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · FINAL THEORY", "🚨 What Happened to Biscuit?", "Use at least three pieces of evidence. Good writers also say what they can't be sure of.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem; color:var(--ink-soft);">Try this structure:<br>
+          <i>I think ______. One clue is ______. This suggests ______. Another clue is ______. This could mean ______. However, we cannot be completely certain because ______.</i></p></div>`));
+        const ta = el(`<textarea placeholder="Write your detective theory here..." style="min-height:160px;"></textarea>`);
+        ta.value = ctx.getAnswer("c3_theory")||"";
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("c3_theory", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(10, words>=30?2:(words>0?1:0)); ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){ const words = ta.value.trim().split(/\s+/).filter(Boolean).length; ctx.awardStars(10, words>=30?2:1); }
+        footer(stage, s, ctx);
+      }},
+    {id:11, key:"journal", label:"Weekly Case Journal (paper)", icon:"📓", skill:"Writing", maxStars:1,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 003 · HOMEWORK", "📓 The Weekly Case Journal", "The investigation keeps going after the lesson ends. One page a day:");
+        const days = [
+          ["Day 1 — Case Summary", "Write 6–8 sentences summarizing the case in chronological order, in your own words, with no unnecessary details. Use at least 3 sequencing words (First… Next… Then… Finally…)."],
+          ["Day 2 — Evidence Log", "Choose 4 pieces of evidence. For each: the evidence, what it tells you, and how important it is (⭐ / ⭐⭐ / ⭐⭐⭐)."],
+          ["Day 3 — Handwriting", "Copy neatly: \"The muddy paw prints suggested that Biscuit may have left the backyard, but they did not prove where he went.\" Then rewrite it without looking and compare: capitals, spelling, punctuation, spacing, letter formation."],
+          ["Day 4 — Vocabulary", "Pick 5 words from the case. For each: word, definition, synonym, and your own sentence."],
+          ["Day 5 — Final Theory", "One paragraph (7–10 sentences): where do you think Biscuit went and what happened? Use 3+ pieces of evidence, 2+ sequencing words, one inference, and one thing you cannot prove yet. End with: \"I cannot be completely certain because…\""]
+        ];
+        days.forEach(([t,d])=>stage.appendChild(el(`<div class="journal-day"><h4>${t}</h4><p>${d}</p></div>`)));
+        stage.appendChild(el(`<div class="card"><div class="q-prompt">🚨 Mid-week new evidence (tutor releases this)</div>
+          <p style="font-size:0.88rem;">A neighbour reports seeing a <b>red bicycle</b> near the park at approximately 2:15 PM. The rider was carrying something small in a basket — it turns out to be the neighbourhood's Saturday newspaper delivery, completely unrelated to Biscuit.</p>
+          <p style="font-size:0.85rem; color:var(--ink-soft); margin-top:6px;">Does this change your theory? Explain why or why not.</p></div>`));
+        buildPaperTask(stage, s, `Print or copy this into the detective notebook to work through across the week.`, "Journal pages are printed / started", ctx, "journalStarted");
+        footer(stage, s, ctx);
+      }},
+    {id:12, key:"closed", label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0,
+      render:(stage, s, ctx)=>{
+        stage.innerHTML="";
+        const name = ctx.getAgent() || "Detective";
+        stage.appendChild(el(`<div class="closed-banner">
+          <div class="stamp-big">TO BE CONTINUED</div>
+          <h2>Great work, ${name}!</h2>
+          <p class="stage-sub" style="max-width:560px; margin:10px auto 0;">You've built the timeline and written your theory. Keep investigating in your case journal this week — the final evidence is revealed next lesson.</p></div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
+          <div class="q-prompt">🏅 Achievement unlocked: Timeline Master</div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const revealBox = el(`<div style="max-width:560px; margin:0 auto 16px; text-align:center;"></div>`);
+        const revealBtn = el(`<button class="btn primary">🔓 Tutor only: reveal the solution (next lesson)</button>`);
+        revealBtn.addEventListener("click", ()=>{
+          revealBtn.remove();
+          revealBox.appendChild(el(`<div class="card story" style="text-align:left;">
+            <p><b>🚨 NEW EVIDENCE</b></p>
+            <p>A neighbour checked their doorbell camera. At <b>2:07 PM</b>, Biscuit is visible standing beside the backyard gate. At <b>2:08 PM</b>, a strong gust of wind blows the gate open, and Biscuit runs through the opening.</p>
+            <p>A few seconds later, a red bicycle passes the house. The cyclist stops briefly when they see Biscuit running toward the park, but then continues riding. At <b>2:15 PM</b>, Biscuit appears on the neighbour's camera again — running toward the park.</p>
+            <p><b>Solution:</b> Biscuit was not stolen. The gate wasn't properly latched, so the wind blew it open and he ran out. His collar likely came off near the gate. The red fabric was unrelated — a misleading clue — and so was the red bicycle: the rider was just delivering the Saturday newspapers and had nothing to do with Biscuit. The muddy paw prints show Biscuit leaving the yard toward the park, which is where the doorbell camera picks him up again.</p>
+            <p><b>Not every mystery has a criminal.</b> Good detectives don't force the evidence to fit a crime.</p>
+          </div>`));
+        });
+        revealBox.appendChild(revealBtn);
+        stage.appendChild(revealBox);
+        const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
+        const rta = reflect.querySelector("textarea");
+        rta.value = ctx.getAnswer("reflection")||"";
+        rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
+        stage.appendChild(reflect);
+        if(!ctx.isComplete(12)){ ctx.markComplete(12); ctx.logCompletion(); }
+      }}
+  ]
+};
+
+const CASES = {"001": CASE1, "002": CASE2, "003": CASE3};
 
 /* ============================================================
    ENGINE
    ============================================================ */
-const SKILL_ORDER = ["Focus","Evidence","Reading","Vocabulary","Spelling","Writing"];
+const SKILL_ORDER = ["Focus","Evidence","Reading","Sequencing","Summarizing","Vocabulary","Spelling","Writing"];
 const STORE_KEY = "detectiveFiles_progress_v2";
 
 function loadProgress(){
