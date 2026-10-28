@@ -1187,12 +1187,311 @@ const CASE3 = {
   ]
 };
 
-const CASES = {"001": CASE1, "002": CASE2, "003": CASE3};
+/* ============================================================
+   CASE #004 — THE PAINTING THAT CHANGED OVERNIGHT
+   ============================================================ */
+const CASE4_DETAIL_Q = [
+  {q:"A) The painting was nice.<br>B) The painting showed a small village beneath a stormy purple sky.", opts:["Option A","Option B"], correct:1},
+  {q:"A) Someone left something on the desk.<br>B) Someone left a folded envelope beside the desk lamp.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The man was upset.<br>B) The man clenched his fists and stared at the floor.", opts:["Option A","Option B"], correct:1, why:"Option B gives observable evidence of his feelings instead of just naming the feeling."},
+  {q:"A) There was a sound.<br>B) Three sharp knocks echoed through the hallway.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The painting looked different.<br>B) The yellow flower near the bottom-right corner was no longer visible.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The room had things in it.<br>B) A wooden desk, two stools, and a narrow bookshelf filled the room.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The paper felt strange.<br>B) The paper was rough around its torn edges.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The person moved quickly.<br>B) The person dashed through the doorway.", opts:["Option A","Option B"], correct:1}
+];
+const CASE4_OI_Q = [
+  {q:"The frame is gold.", opts:["Observation","Interpretation"], correct:0, why:"Something you can directly see — a fact."},
+  {q:"Someone deliberately damaged the painting.", opts:["Observation","Interpretation"], correct:1, why:"This is a guess about what the facts mean."},
+  {q:"A yellow square is attached to the glass.", opts:["Observation","Interpretation"], correct:0, why:"Directly observed."},
+  {q:"The gallery assistant is hiding something.", opts:["Observation","Interpretation"], correct:1, why:"We're interpreting his behaviour, not stating a fact."},
+  {q:"The room has two windows.", opts:["Observation","Interpretation"], correct:0, why:"Directly observed."},
+  {q:"The painting was changed overnight.", opts:["Observation","Interpretation"], correct:1, why:"Unless it's independently verified, this is still a conclusion, not a direct observation."},
+  {q:"The clock reads 9:15.", opts:["Observation","Interpretation"], correct:0, why:"Directly observed."},
+  {q:"The person who visited last night must be responsible.", opts:["Observation","Interpretation"], correct:1, why:"\"Must be\" is a guess, not a fact."}
+];
+const CASE4_VOCAB_Q = [
+  {q:'<b>faded</b> — "The old photograph had faded colours that were difficult to distinguish."', opts:["Less bright or vivid than before","Extremely bright","Very large","Completely torn"], correct:0},
+  {q:'<b>intricate</b> — "The frame had an intricate pattern of leaves."', opts:["Having many small, detailed parts","Very plain and simple","Broken","Heavy"], correct:0},
+  {q:'<b>vivid</b> — "Vivid red flowers stood out against the grass."', opts:["Very bright, clear, or intense","Dull and faded","Small and rare","Hidden"], correct:0},
+  {q:'<b>glimpse</b> — "Maya caught a glimpse of something yellow."', opts:["A brief look","A long stare","A loud sound","A written note"], correct:0},
+  {q:'<b>obscure</b> — "A shadow obscured part of the picture."', opts:["To hide or make something hard to see","To brighten something","To repair something","To frame something"], correct:0},
+  {q:'<b>contrast</b> — "The bright flower contrasted with the dark background."', opts:["A noticeable difference between things","A perfect match","A missing piece","A blurry image"], correct:0},
+  {q:'<b>delicate</b> — "The delicate paper tore at the corner."', opts:["Fine, fragile, or easily damaged","Thick and strong","Colourful","Expensive"], correct:0},
+  {q:'<b>inspect</b> — "The curator inspected the glass for scratches."', opts:["To examine carefully","To ignore completely","To purchase","To remove"], correct:0}
+];
+const CASE4_MONEY_Q = [
+  {q:"5 cents = ?", opts:["$0.05","$0.50","$5.00"], correct:0},
+  {q:"50 cents = ?", opts:["$0.50","$0.05","$5.00"], correct:0},
+  {q:"125 cents = ?", opts:["$1.25","$12.50","$0.125"], correct:0},
+  {q:"8 cents = ?", opts:["$0.08","$0.80","$8.00"], correct:0},
+  {q:"345 cents = ?", opts:["$3.45","$34.50","$0.345"], correct:0},
+  {q:"$4.50 written in cents is:", opts:["450","45","4500"], correct:0},
+  {q:"The gift shop price tag said \"$4.5\" — what's the problem?", opts:["It's missing the second decimal digit, so it could be misread as $4.50 or $4.05","It means exactly $4.50, no issue at all","It means exactly $45.00"], correct:0, why:"A missing zero can completely change the value — exactly why writing money amounts carefully matters!"},
+  {q:"Paying in cash, $3.42 rounds to the nearest 5 cents:", opts:["$3.40","$3.45","$3.35"], correct:0},
+  {q:"Paying in cash, $3.43 rounds to the nearest 5 cents:", opts:["$3.45","$3.40","$3.50"], correct:0},
+  {q:"Round $7.86 to the nearest dollar:", opts:["$8","$7","$9"], correct:0}
+];
+const CASE4_STORY = [
+  "It was Wednesday morning when the curator of Greenwood Art Gallery noticed something unusual.",
+  "A landscape painting called The Quiet Village had hung in the same hallway for nearly forty years. It showed a small village beside a winding river, with a stone bridge crossing the water and dark green hills rising behind it. Near the bottom-right corner, a tiny yellow flower grew beside a wooden fence.",
+  "The painting was surrounded by an intricate golden frame. Its colours were slightly faded, but the details were still clear.",
+  "At 8:30 a.m., the curator, Ms. Ellis, stopped in front of it. \"Something is different,\" she whispered. She called her assistant, Noah. \"Look carefully. What do you notice?\" Noah studied the painting. \"The flower is gone,\" he said.",
+  "Ms. Ellis nodded. The tiny yellow flower, which had always been visible beside the fence, seemed to have disappeared. The rest of the landscape looked exactly as it had the day before. There was no broken glass. The frame was undamaged, and the painting was still securely attached to the wall.",
+  "While Ms. Ellis examined the painting, Noah mentioned something else. \"The gift shop's cash box was twelve cents short this morning,\" he said. \"I think it's because I wrote a price tag as '$4.5' instead of '$4.50,' and a customer thought it meant four dollars and five cents.\" Ms. Ellis raised an eyebrow. \"That's a separate problem, Noah — but a good one to fix. Let's look at the painting first.\"",
+  "Ms. Ellis checked the gallery's visitor log. The building had closed at 5:00 p.m. the previous evening. After closing, only two employees had remained: Noah and the evening cleaner, Mrs. Brooks. Noah explained that he had spent the evening organizing brochures at the front desk. Mrs. Brooks said she had cleaned the hallway but had not touched the painting. \"I only wiped the floor and dusted the frame,\" she explained.",
+  "Ms. Ellis examined the painting more closely. She noticed a faint, square-shaped outline on the glass near the bottom-right corner. It was almost invisible unless the light struck it at an angle. \"That's strange,\" Noah said. \"I don't remember seeing that yesterday.\"",
+  "She then asked the gallery's restoration specialist, Mr. Alvarez, to inspect the painting. He arrived carrying a small flashlight. He tilted it toward the lower-right corner, and a faint yellow reflection appeared on the glass. \"Wait,\" Ms. Ellis said. \"Is that...?\" Something had been covering that part of the painting. But who had placed it there, and why did the flower appear to be missing?"
+];
+const CASE4_RECALL_Q = [
+  {q:"Where does the story take place?", opts:["Greenwood Art Gallery","Greenwood Library","Riverside Museum","City Hall"], correct:0},
+  {q:"What is the painting called?", opts:["The Quiet Village","The Golden Hills","Morning at the River","The Old Bridge"], correct:0},
+  {q:"What detail appears to have disappeared from the painting?", opts:["The tiny yellow flower","The stone bridge","The wooden fence","The dark green hills"], correct:0},
+  {q:"Who remained in the gallery after closing?", opts:["Noah and Mrs. Brooks","Ms. Ellis and Mr. Alvarez","Just Mrs. Brooks","Just Noah"], correct:0},
+  {q:"What unusual mark did Ms. Ellis discover on the glass?", opts:["A faint, square-shaped outline","A deep crack","A handprint","A water stain"], correct:0},
+  {q:"What was Noah's separate money mix-up about?", opts:["A price tag written as \"$4.5\" instead of \"$4.50\"","A missing ticket stub","A torn dollar bill","A wrong admission price"], correct:0}
+];
+const CASE4_INFER_Q = [
+  {q:"Does the yellow reflection prove what covered the flower? Why or why not?", sample:"No — it only suggests something yellow is near the glass. We need more evidence before we know exactly what it is."},
+  {q:"Is Noah's price tag mix-up connected to the missing flower? Explain.", sample:"Probably not — it looks like a separate, ordinary mistake. Not every odd detail in a mystery turns out to be a clue."}
+];
+const CASE4_CLUE_MATCH_Q = [
+  {q:"Clue: \"The flower is not visible.\" What might this suggest?", opts:["Something may be covering it","The flower is permanently gone","The painting was repainted"], correct:0},
+  {q:"Clue: \"The frame is undamaged.\" What might this suggest?", opts:["There's no obvious sign of force or damage","Someone definitely broke in","The frame was recently replaced"], correct:0},
+  {q:"Clue: \"A square outline appears on the glass.\" What might this suggest?", opts:["Something square-shaped may have been attached to it","The glass is cracked","It's just a reflection of a window"], correct:0},
+  {q:"Clue: \"A yellow reflection appears under the flashlight.\" What might this suggest?", opts:["A yellow object may be reflecting light","The painting's flower grew back","The glass itself is yellow"], correct:0},
+  {q:"Clue: \"The painting is still securely attached to the wall.\" What might this suggest?", opts:["It probably wasn't removed from the wall","It was stolen and returned","It fell and was rehung"], correct:0}
+];
+const CASE4_SENSORY_Q = [
+  {q:"A) The gallery was quiet.<br>B) The gallery was so quiet that the ticking clock echoed through the hallway.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The painting was colourful.<br>B) Vivid blue hills and bright yellow flowers filled the landscape.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The frame felt strange.<br>B) The wooden frame felt rough and uneven beneath my fingertips.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The hallway smelled bad.<br>B) A musty smell lingered in the narrow hallway.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The door made a sound.<br>B) The heavy door creaked loudly as it swung open.", opts:["Option A","Option B"], correct:1}
+];
+const CASE4_WORD_BANK = ["intricate","faded","vivid","delicate","dim","hushed","gleaming","shadowy","golden","towering","silent","faint"];
+
+const CASE4 = {
+  id:"004", tabLabel:"Case #004", tabSub:"The Painting",
+  title:'Case #004: The <span>Painting That Changed Overnight</span>', stamp:"OPEN CASE",
+  stations:[
+    {id:0, key:"briefing", label:"The Briefing", icon:"🖼️", skill:"Focus", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · BRIEFING", "🖼️ The Briefing", "Nobody's missing this time, detective.");
+        stage.appendChild(el(`<div class="card">
+          <p>Nobody has reported anything missing. The object is still there — but someone claims it looks different from yesterday.</p>
+          <p style="margin-top:8px;">Your mission: figure out what changed, find the clues, and describe the scene so precisely that another detective could picture it without ever visiting.</p>
+        </div>`));
+        ctx.awardStars(0,2);
+        footer(stage, s, ctx);
+      }},
+    {id:1, key:"descriptive", label:"Descriptive Language", icon:"🎨", skill:"Reading", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · DESCRIPTIVE LANGUAGE", "🎨 Spot the Strongest Detail", "Descriptive language uses specific words to help a reader picture something. For each pair, pick the one that paints a clearer picture.");
+        stage.appendChild(el(`<div class="card">
+          <p><b>Adjectives</b> describe nouns (faded canvas, golden frame). <b>Strong verbs</b> show precise action (crept, not went). <b>Specific nouns</b> name things exactly (a folded yellow note, not "a thing"). <b>Sensory details</b> help readers imagine an experience.</p>
+          <p style="margin-top:8px; font-size:0.85rem; color:var(--ink-soft);">A strong description isn't the longest one — it's the one with the right details.</p>
+        </div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE4_DETAIL_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:2, key:"observation", label:"Observation vs. Interpretation", icon:"👁️", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · OBSERVATION", "👁️ Observation vs. Interpretation", "Observation = what you can directly see or hear. Interpretation = what you think it means. Sort each statement.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem;"><b>Describe first. Interpret second. Prove your theory with evidence.</b></p></div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE4_OI_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:3, key:"vocab", label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · VOCABULARY", "🔤 Vocabulary Detective", "Use the sentence around each word to figure out its meaning.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE4_VOCAB_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:4, key:"money", label:"Detective Math Break", icon:"💰", skill:"Math", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · MATH BREAK", "💰 The Gift Shop Mix-Up", "Noah's till was twelve cents short this morning. Before we get back to the painting, let's sort out the money.");
+        stage.appendChild(el(`<div class="card">
+          <p>Converting between cents and dollars: <b>move the decimal point two places</b>. 100 cents = $1.00.</p>
+          <p style="margin-top:8px;">When paying with cash in Canada, totals round to the nearest 5 cents (no more pennies!). When rounding to the nearest dollar, look at the cents: 50¢ or more rounds up.</p>
+        </div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE4_MONEY_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:5, key:"story", label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · THE CASE", "📖 The Painting That Changed Overnight", "Read carefully — and watch for which details actually matter.");
+        stage.appendChild(el(`<div class="card story">${CASE4_STORY.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        ctx.awardStars(5,2);
+        footer(stage, s, ctx);
+      }},
+    {id:6, key:"interro", label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · INTERROGATION", "🧠 The Interrogation", "Quick recall first, then two thinking questions.");
+        let mcCorrect = 0;
+        const mcTotal = CASE4_RECALL_Q.length;
+        const frTotal = CASE4_INFER_Q.length;
+        function updateStars(){
+          let frDone = 0;
+          CASE4_INFER_Q.forEach((_,i)=>{ if(ctx.getAnswer("c4_infer_"+i+"_revealed")) frDone++; });
+          const ratio = (mcCorrect/mcTotal + frDone/frTotal) / 2;
+          ctx.awardStars(6, Math.round(ratio*4));
+          ctx.refresh();
+        }
+        const mcWrap = el(`<div></div>`);
+        CASE4_RECALL_Q.forEach((item, idx)=>{
+          const block = el(`<div class="q-block card"><div class="q-prompt">${idx+1}. ${item.q}</div></div>`);
+          const opts = el(`<div class="opts"></div>`);
+          item.opts.forEach((label, oi)=>{
+            const b = el(`<button class="opt">${label}</button>`);
+            b.addEventListener("click", ()=>{
+              [...opts.children].forEach(c=>c.disabled=true);
+              if(oi===item.correct){ b.classList.add("correct"); mcCorrect++; }
+              else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+              updateStars();
+            });
+            opts.appendChild(b);
+          });
+          block.appendChild(opts);
+          mcWrap.appendChild(block);
+        });
+        stage.appendChild(mcWrap);
+        const frWrap = el(`<div></div>`);
+        buildFreeResponse(frWrap, {id:6, maxStars:0}, CASE4_INFER_Q, ctx, "c4_infer");
+        stage.appendChild(frWrap);
+        footer(stage, s, ctx);
+      }},
+    {id:7, key:"evboard", label:"The Evidence Board", icon:"🗂️", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · EVIDENCE BOARD", "🗂️ The Evidence Board", "For each clue, pick what it most likely suggests.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE4_CLUE_MATCH_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:8, key:"sensory", label:"Sensory Details", icon:"✨", skill:"Vocabulary", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · IMAGERY", "✨ Sensory Details", "Imagery uses the senses — sight, sound, touch, smell, taste — to help a reader experience a scene. Pick the stronger version.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE4_SENSORY_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:9, key:"handwriting", label:"Handwriting Check (paper)", icon:"✒️", skill:"Spelling", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · PAPER EVIDENCE", "✒️ The Curator's Notebook", "A curator needs accurate records — grab a pencil!");
+        buildPaperTask(stage, s, `Copy this paragraph by hand:<br><br>
+          <i>"The painting hung in a golden frame. Near the bottom-right corner, a tiny yellow flower grew beside a wooden fence. On Wednesday morning, the flower seemed to have disappeared. A faint square outline remained on the glass."</i><br><br>
+          1. Copy it carefully.<br>2. Underline all the descriptive words and phrases.<br>3. Circle the location details (like "bottom-right corner").<br>4. Cover it up and rewrite the final sentence from memory.`,
+          "I finished the notebook copy on paper with my tutor", ctx, "handwritingDone");
+        footer(stage, s, ctx);
+      }},
+    {id:10, key:"describe", label:"Describe the Scene", icon:"🖊️", skill:"Writing", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · THE GALLERY AT NIGHT", "🖊️ Describe the Scene", "Imagine you're the first detective in the gallery Wednesday morning. Describe it in 4–6 sentences so someone who's never been there can picture it.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem; color:var(--ink-soft);">Tap a word below to drop it into your paragraph, then build your sentences around it.</p></div>`));
+        const bank = el(`<div class="word-parts" style="margin-bottom:10px;"></div>`);
+        const ta = el(`<textarea placeholder="When I entered the gallery, I noticed..." style="min-height:140px;"></textarea>`);
+        ta.value = ctx.getAnswer("c4_describe")||"";
+        CASE4_WORD_BANK.forEach(word=>{
+          const chip = el(`<span style="cursor:pointer;">+ ${word}</span>`);
+          chip.addEventListener("click", ()=>{
+            ta.value = ta.value.trim().length ? ta.value.trim()+" "+word+" " : word+" ";
+            ta.dispatchEvent(new Event("input"));
+            ta.focus();
+          });
+          bank.appendChild(chip);
+        });
+        stage.appendChild(bank);
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("c4_describe", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(10, words>=25?3:(words>=10?2:(words>0?1:0)));
+          ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(10, words>=25?3:(words>=10?2:1));
+        }
+        footer(stage, s, ctx);
+      }},
+    {id:11, key:"theory", label:"Final Theory", icon:"🔎", skill:"Writing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · FINAL THEORY", "🔎 What Happened to the Flower?", "Use one clue from the story. 2–3 sentences is plenty.");
+        const ta = el(`<textarea placeholder="I think the flower appeared to disappear because..."></textarea>`);
+        ta.value = ctx.getAnswer("c4_theory")||"";
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("c4_theory", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(11, words>=12?2:(words>0?1:0)); ctx.refresh();
+        });
+        stage.appendChild(el(`<div class="card"></div>`)).appendChild(ta);
+        if(ta.value){ const words = ta.value.trim().split(/\s+/).filter(Boolean).length; ctx.awardStars(11, words>=12?2:1); }
+        footer(stage, s, ctx);
+      }},
+    {id:12, key:"journal", label:"Weekly Case Journal (paper)", icon:"📓", skill:"Writing", maxStars:1,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 004 · HOMEWORK", "📓 The Weekly Case Journal", "One short page a day:");
+        const days = [
+          ["Day 1 — Case Summary", "6–8 sentences summarizing the mystery: what was noticed, who investigated, the key clues, and how it was solved."],
+          ["Day 2 — The Detail Detective", "Find 5 descriptive details in the story. For each: the detail, what it helps you imagine, and why it matters."],
+          ["Day 3 — Handwriting", "Copy: \"The faint yellow reflection appeared on the glass when the curator tilted her flashlight.\" Then rewrite it from memory and compare."],
+          ["Day 4 — Vocabulary", "Pick 5 words from the case. Word, meaning, synonym, and your own sentence for each."],
+          ["Day 5 — Create Your Own Mystery Scene", "A descriptive paragraph (8–10 sentences) about a mysterious room, object, or painting — 5 details, 3 strong verbs, 2 sensory details, one mood sentence, one unusual clue."]
+        ];
+        days.forEach(([t,d])=>stage.appendChild(el(`<div class="journal-day"><h4>${t}</h4><p>${d}</p></div>`)));
+        buildPaperTask(stage, s, `Print or copy this into the detective notebook to work through across the week.`, "Journal pages are printed / started", ctx, "journalStarted");
+        footer(stage, s, ctx);
+      }},
+    {id:13, key:"closed", label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0,
+      render:(stage, s, ctx)=>{
+        stage.innerHTML="";
+        const name = ctx.getAgent() || "Detective";
+        stage.appendChild(el(`<div class="closed-banner">
+          <div class="stamp-big">TO BE CONTINUED</div>
+          <h2>Nicely observed, ${name}!</h2>
+          <p class="stage-sub" style="max-width:560px; margin:10px auto 0;">You've described the scene and picked a theory. Keep your case journal going this week — the real explanation is revealed next lesson.</p></div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
+          <div class="q-prompt">🏅 Achievement unlocked: Detail Detective</div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const revealBox = el(`<div style="max-width:560px; margin:0 auto 16px; text-align:center;"></div>`);
+        const revealBtn = el(`<button class="btn primary">🔓 Tutor only: reveal the solution (next lesson)</button>`);
+        revealBtn.addEventListener("click", ()=>{
+          revealBtn.remove();
+          revealBox.appendChild(el(`<div class="card story" style="text-align:left;">
+            <p><b>Solution:</b> The flower was never removed from the painting. Mrs. Brooks, the evening cleaner, noticed a dusty patch on the glass and stuck a small yellow sticky note on the outside to remind herself to clean it the next morning — then forgot to take it off. The square outline was the note's adhesive mark, and the yellow reflection was the note itself catching the flashlight.</p>
+            <p>Mr. Alvarez peeled the note away, and the tiny yellow flower was right there underneath, exactly where it had always been. "So the mystery wasn't about what disappeared," Ms. Ellis said. "It was about what we couldn't see."</p>
+            <p><b>And the gift shop mix-up?</b> Just an ordinary pricing mistake — a missing zero on a tag, nothing to do with the painting at all. Not every odd detail in a mystery turns out to matter.</p>
+          </div>`));
+        });
+        revealBox.appendChild(revealBtn);
+        stage.appendChild(revealBox);
+        const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
+        const rta = reflect.querySelector("textarea");
+        rta.value = ctx.getAnswer("reflection")||"";
+        rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
+        stage.appendChild(reflect);
+        if(!ctx.isComplete(13)){ ctx.markComplete(13); ctx.logCompletion(); }
+      }}
+  ]
+};
+
+
+const CASES = {"001": CASE1, "002": CASE2, "003": CASE3, "004": CASE4};
 
 /* ============================================================
    ENGINE
    ============================================================ */
-const SKILL_ORDER = ["Focus","Evidence","Reading","Sequencing","Summarizing","Vocabulary","Spelling","Writing"];
+const SKILL_ORDER = ["Focus","Evidence","Reading","Sequencing","Summarizing","Vocabulary","Spelling","Writing","Math"];
 const STORE_KEY = "detectiveFiles_progress_v2";
 
 function loadProgress(){
