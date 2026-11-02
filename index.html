@@ -257,6 +257,15 @@
    ============================================================ */
 function el(html){ const d=document.createElement("div"); d.innerHTML=html.trim(); return d.firstChild; }
 
+function shuffledIndices(n){
+  const idx = Array.from({length:n}, (_,i)=>i);
+  for(let i=idx.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return idx;
+}
+
 function buildMCQuiz(container, station, questions, ctx){
   let correct = 0;
   const graded = questions.length;
@@ -267,12 +276,18 @@ function buildMCQuiz(container, station, questions, ctx){
     if(item.why){
       fb = el(`<div class="feedback"></div>`);
     }
-    item.opts.forEach((label, oi)=>{
+    // Shuffle the option order on every render, so the correct answer
+    // doesn't always land in the same spot (e.g. always option A/first).
+    const order = shuffledIndices(item.opts.length);
+    const correctBtnByOrigIdx = {};
+    order.forEach((oi)=>{
+      const label = item.opts[oi];
       const b = el(`<button class="opt">${label}</button>`);
+      correctBtnByOrigIdx[oi] = b;
       b.addEventListener("click", ()=>{
         [...opts.children].forEach(c=>c.disabled=true);
         if(oi===item.correct){ b.classList.add("correct"); correct++; }
-        else { b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+        else { b.classList.add("wrong"); correctBtnByOrigIdx[item.correct].classList.add("correct"); }
         if(fb){
           fb.classList.add("show", oi===item.correct?"good":"bad");
           fb.textContent = item.why;
@@ -1486,7 +1501,285 @@ const CASE4 = {
 };
 
 
-const CASES = {"001": CASE1, "002": CASE2, "003": CASE3, "004": CASE4};
+/* ============================================================
+   CASE #005 — THE STOLEN PHONE
+   ============================================================ */
+const CASE5_FACT_OPINION_Q = [
+  {q:"The Earth revolves around the Sun.", opts:["Fact","Opinion"], correct:0, why:"This can be checked and proven — a fact."},
+  {q:"Pizza is better than pasta.", opts:["Fact","Opinion"], correct:1, why:"This is a personal judgment, not something that can be proven true for everyone."},
+  {q:"The school library has four bookshelves.", opts:["Fact","Opinion"], correct:0, why:"You could count the bookshelves to verify this."},
+  {q:"Reading is boring.", opts:["Fact","Opinion"], correct:1, why:"This expresses a personal feeling — someone else might feel differently."},
+  {q:"A week has seven days.", opts:["Fact","Opinion"], correct:0, why:"A verifiable fact."},
+  {q:"The classroom is too cold.", opts:["Fact","Opinion"], correct:1, why:"\"Too cold\" is a judgment — the actual temperature is a fact, but \"too\" is an opinion."},
+  {q:"The phone was found underneath a desk.", opts:["Fact","Opinion"], correct:0, why:"This can be verified by checking where it was found."},
+  {q:"Everyone should have a pet.", opts:["Fact","Opinion"], correct:1, why:"This is a belief about what people should do, not a provable fact."},
+  {q:"The teacher arrived at 9:00 a.m.", opts:["Fact","Opinion"], correct:0, why:"A specific, checkable detail."},
+  {q:"Dogs make better pets than cats.", opts:["Fact","Opinion"], correct:1, why:"A matter of personal preference."}
+];
+const CASE5_PERSPECTIVE_Q = [
+  {q:'"I thought the movie was exciting."', opts:["Perspective","Bias"], correct:0, why:"A personal reaction to an experience — not a judgment about a person."},
+  {q:'"I dislike Sophie, so she must be lying."', opts:["Perspective","Bias"], correct:1, why:"Her dislike is influencing her judgment of whether Sophie is truthful — that's bias."},
+  {q:'"I heard a loud noise from the hallway."', opts:["Perspective","Bias"], correct:0, why:"A personal observation/experience."},
+  {q:'"Our team is obviously better than theirs."', opts:["Perspective","Bias"], correct:1, why:"A leaning toward one's own side, stated as fact."},
+  {q:'"I saw Liam leave the classroom at 2:00."', opts:["Perspective","Bias"], correct:0, why:"A direct personal observation."},
+  {q:'"I always trust my best friend, so I know she\'s right."', opts:["Perspective","Bias"], correct:1, why:"Trusting someone doesn't prove they're correct — this is a leaning, not evidence."},
+  {q:'"The room seemed frightening to me."', opts:["Perspective","Bias"], correct:0, why:"A personal feeling about an experience."},
+  {q:'"He looks suspicious because he wears dark clothes."', opts:["Perspective","Bias"], correct:1, why:"Judging someone based on appearance, without evidence, is bias."}
+];
+const CASE5_VOCAB_Q = [
+  {q:'<b>accusation</b> — "Noah made a serious accusation against Tyler."', opts:["A claim that someone did something wrong","A compliment","A type of evidence","A written apology"], correct:0},
+  {q:'<b>evidence</b> — "Mr. Lewis looked for evidence before deciding what happened."', opts:["Proof or information that supports a conclusion","A guess with no support","A rule in the classroom","A type of camera"], correct:0},
+  {q:'<b>perspective</b> — "Each witness had a different perspective on the event."', opts:["A particular way of seeing or understanding something","A false statement","A type of punishment","An official report"], correct:0},
+  {q:'<b>reliable</b> — "Is Noah\'s account reliable, or could it be mistaken?"', opts:["Trustworthy and consistent","Loud and confusing","Brand new","Written in cursive"], correct:0},
+  {q:'<b>assumption</b> — "Noah\'s assumption was that Tyler must be guilty."', opts:["Something believed to be true without proof","A fact confirmed by a camera","An official school rule","A type of apology"], correct:0},
+  {q:'<b>suspicious</b> — "Tyler\'s behaviour seemed suspicious to Noah."', opts:["Seeming like it might involve something wrong","Extremely organized","Very friendly","Easy to understand"], correct:0},
+  {q:'<b>verify</b> — "Mr. Lewis wanted to verify the story before deciding."', opts:["To check if something is true","To forget about something","To accuse someone","To apologize"], correct:0},
+  {q:'<b>conclude</b> — "Based on the evidence, what can we conclude?"', opts:["To reach a final decision based on evidence","To begin a story","To copy someone else's answer","To ask a new question"], correct:0}
+];
+const CASE5_STORY = [
+  "It was Monday afternoon when Priya realized her phone was missing. She had placed it on the corner of her desk before lunch — a black smartphone with a small silver star sticker on the back. When she returned to class at 12:45 p.m., it was gone.",
+  '"Someone stole my phone!" she exclaimed. Her teacher, Mr. Lewis, asked everyone to stay calm. "Before we accuse anyone, let\'s find out what happened," he said.',
+  "Three students had been in the classroom during lunch: Ethan, Noah, and Tyler. Ethan explained he'd been working on his science assignment and hadn't gone near Priya's desk. He did remember seeing the phone there before lunch, but hadn't noticed it afterward.",
+  'Noah gave a different account. "I saw Tyler standing near Priya\'s desk around 12:20. He was looking down at something, but I couldn\'t tell what it was." Tyler looked surprised. "I was looking for my water bottle! I didn\'t take anything." Noah frowned. "Tyler always does things like this. He\'s always playing tricks on people." When Mr. Lewis asked whether Noah had actually seen Tyler holding the phone, Noah admitted, "No. But he was standing right beside her desk."',
+  "Tyler explained that he had gone to the gym at around 12:25 to return a basketball. Mr. Lewis decided to check the classroom's security camera.",
+  "The footage showed Tyler walking past Priya's desk at 12:20. He stopped briefly, bent down, and picked up something small from the floor before walking toward the door. Noah pointed at the screen. \"See! I told you he took it!\" But Mr. Lewis paused the recording — the object was too small to identify clearly, and Tyler had clearly been reaching toward the floor, not the desk.",
+  "Just then, the school secretary called: a black smartphone had been handed in to the main office. Priya described the silver star sticker. It was her phone. When Mr. Lewis asked who had handed it in, the secretary gave an unexpected answer: it was Tyler. \"I can explain,\" Tyler said. \"I found it on the floor near the desk and was going to hand it in — I forgot because I had to return the basketball.\"",
+  "Mr. Lewis rewound the footage even further — all the way back to 12:15, five minutes before Tyler ever entered the shot. For just a second or two, a second, blurrier figure appeared near the classroom door, then disappeared again before Tyler arrived.",
+  "\"That's strange,\" Mr. Lewis murmured. \"Who else was in this room before Tyler?\" Nobody in the classroom recognized the shape on the grainy recording. Tyler had picked the phone up off the floor — but if it had been sitting safely on Priya's desk before lunch, how did it end up on the floor in the first place? And who was that second figure?"
+];
+const CASE5_RECALL_Q = [
+  {q:"Who owns the missing phone?", opts:["Priya","Noah","Ethan","Tyler"], correct:0},
+  {q:"What does the phone look like?", opts:["A black smartphone with a silver star sticker","A pink phone with a case","A tablet","A phone with a cracked screen"], correct:0},
+  {q:"What did Noah claim to have seen?", opts:["Tyler standing near Priya's desk, looking down at something","Tyler holding the phone up to his ear","Ethan near the desk","Nothing unusual"], correct:0},
+  {q:"Did Noah actually see Tyler holding the phone?", opts:["No — only standing nearby","Yes, clearly","Yes, on video only","He wasn't in the room"], correct:0},
+  {q:"What was Tyler's explanation for picking something up?", opts:["He found it on the floor and planned to hand it in","He was hiding it in his backpack","He was showing it to Noah","He didn't pick anything up"], correct:0},
+  {q:"What unexpected detail did Mr. Lewis find earlier in the footage?", opts:["A second, blurry figure near the door at 12:15","A broken window","A note on the desk","Another phone"], correct:0}
+];
+const CASE5_WITNESS_Q = [
+  {q:"Which student actually saw Tyler near the desk?", opts:["Noah","Tyler","Ethan"], correct:0},
+  {q:"Which student admitted to picking up an object?", opts:["Tyler","Noah","Ethan"], correct:0},
+  {q:"Which statement includes an opinion about Tyler's character, not just an observation?", opts:["Noah's — \"he's always playing tricks on people\"","Tyler's — \"I found it on the floor\"","Ethan's — \"I was working on my assignment\""], correct:0},
+  {q:"Does Noah have solid evidence that Tyler stole the phone?", opts:["No — he only saw Tyler standing nearby","Yes — he saw him take it directly","Yes — the camera proved it instantly"], correct:0},
+  {q:"Is Tyler's explanation automatically true just because he eventually handed the phone in?", opts:["No — it still needs to be weighed against the evidence","Yes — handing it in proves total innocence automatically","Yes — nothing else needs to be checked"], correct:0}
+];
+const CASE5_FOU_Q = [
+  {q:"Priya owns a black smartphone.", opts:["Fact","Opinion","Unsupported claim"], correct:0, why:"Priya identified it as hers, and it was confirmed by its sticker."},
+  {q:"Tyler is a dishonest person.", opts:["Fact","Opinion","Unsupported claim"], correct:1, why:"This is a judgment about his character."},
+  {q:"The camera showed Tyler walking past Priya's desk.", opts:["Fact","Opinion","Unsupported claim"], correct:0, why:"Directly shown on the footage."},
+  {q:"Tyler definitely stole the phone.", opts:["Fact","Opinion","Unsupported claim"], correct:2, why:"There's no proof of intent to steal — this claim goes beyond the evidence."},
+  {q:"The phone was handed in to the main office.", opts:["Fact","Opinion","Unsupported claim"], correct:0, why:"Confirmed by the secretary."},
+  {q:"The phone was sitting on the floor before Tyler picked it up.", opts:["Fact","Opinion","Unsupported claim"], correct:0, why:"Shown directly on the footage."},
+  {q:"Tyler planned to keep the phone for himself.", opts:["Fact","Opinion","Unsupported claim"], correct:2, why:"Nothing in the evidence supports this — it's a guess presented as true."},
+  {q:"Tyler picked up an object at 12:20.", opts:["Fact","Opinion","Unsupported claim"], correct:0, why:"Shown directly on the footage."},
+  {q:"Noah is jealous of Tyler.", opts:["Fact","Opinion","Unsupported claim"], correct:2, why:"We have no evidence about Noah's motivation — this is a guess."},
+  {q:"The silver star sticker was on Priya's phone.", opts:["Fact","Opinion","Unsupported claim"], correct:0, why:"Confirmed by Priya's own description."}
+];
+const CASE5_EVIDENCE_Q = [
+  {q:"Evidence: Tyler was standing near Priya's desk.<br>What does this actually prove?", opts:["He was near the desk — nothing more","He stole the phone"], correct:0},
+  {q:"Evidence: Tyler picked something up off the floor.<br>What does this actually prove?", opts:["He picked up an object","The object was definitely the phone, and he meant to keep it"], correct:0},
+  {q:"Evidence: Noah accused Tyler loudly on camera.<br>What does this actually prove?", opts:["Noah suspected Tyler","Tyler was guilty"], correct:0},
+  {q:"Evidence: Tyler handed in a black phone with a star sticker.<br>What does this actually prove?", opts:["It matched Priya's description","Why the phone ended up on the floor in the first place"], correct:0},
+  {q:"Evidence: A second, blurry figure appears near the door at 12:15 — five minutes before Tyler arrives.<br>What does this suggest?", opts:["Someone else may have been in the room before Tyler ever got there","Tyler must have had a partner helping him"], correct:0}
+];
+const CASE5_CEE_Q = [
+  {q:'Which part of the C-E-E method is this?<br>"I believe Tyler did not steal Priya\'s phone."', opts:["Claim","Evidence","Explanation"], correct:0},
+  {q:'Which part of the C-E-E method is this?<br>"The security footage showed Tyler picking something up off the floor, not the desk."', opts:["Claim","Evidence","Explanation"], correct:1},
+  {q:'Which part of the C-E-E method is this?<br>"This suggests he found it rather than took it from the desk."', opts:["Claim","Evidence","Explanation"], correct:2},
+  {q:'Which part of the C-E-E method is this?<br>"He also handed the phone in to the main office."', opts:["Claim","Evidence","Explanation"], correct:1},
+  {q:'Which part of the C-E-E method is this?<br>"Therefore, the evidence suggests Tyler was telling the truth."', opts:["Claim","Evidence","Explanation"], correct:0}
+];
+const CASE5_EXPLAIN_Q = [
+  {q:"Noah really did see Tyler standing near Priya's desk — that part is true. So why might his accusation still be unreliable?", sample:"Because seeing someone near a desk isn't the same as seeing them take something. Noah is combining a real observation with his own opinion of Tyler (\"he's always playing tricks\") and presenting the result as certain — but he never actually saw Tyler touch, take, or hide the phone."}
+];
+const CASE5_WORD_BANK = ["I believe that","One important piece of evidence is","This suggests that","Another clue is","Although","we cannot conclude that","Based on the available evidence"];
+
+const CASE5 = {
+  id:"005", tabLabel:"Case #005", tabSub:"The Stolen Phone",
+  title:'Case #005: The <span>Stolen Phone</span>', stamp:"OPEN CASE",
+  stations:[
+    {id:0, key:"briefing", label:"The Briefing", icon:"📱", skill:"Focus", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · BRIEFING", "📱 The Briefing", "A confident accusation isn't the same thing as proof.");
+        stage.appendChild(el(`<div class="card">
+          <p>Someone's phone went missing, and three different students have three different stories. Your job isn't to decide who sounds the most convincing — it's to figure out what's actually fact, what's opinion, and what's just a guess dressed up as certainty.</p>
+          <p style="margin-top:8px;">Rule for today: <b>confidence is not evidence.</b></p>
+        </div>`));
+        ctx.awardStars(0,2);
+        footer(stage, s, ctx);
+      }},
+    {id:1, key:"fact_opinion", label:"Fact vs. Opinion", icon:"⚖️", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · FACT VS. OPINION", "⚖️ Fact or Opinion?", "A fact can be checked with evidence. An opinion is a belief, feeling, or judgment.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_FACT_OPINION_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:2, key:"perspective", label:"Perspective & Bias", icon:"👀", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · PERSPECTIVE & BIAS", "👀 Perspective or Bias?", "Perspective is how someone personally sees or experiences something. Bias is when a leaning or feeling shapes a judgment about a person, without real proof.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_PERSPECTIVE_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:3, key:"vocab", label:"Vocabulary Detective", icon:"🔤", skill:"Vocabulary", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · VOCABULARY", "🔤 Vocabulary Detective", "Use the sentence to figure out each word's meaning.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_VOCAB_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:4, key:"story", label:"Read the Case File", icon:"📖", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · THE CASE", "📖 The Stolen Phone", "Read carefully — pay attention to what each witness actually saw versus what they assumed.");
+        stage.appendChild(el(`<div class="card story">${CASE5_STORY.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        ctx.awardStars(4,2);
+        footer(stage, s, ctx);
+      }},
+    {id:5, key:"recall", label:"Case Recall", icon:"🧾", skill:"Reading", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · RECALL", "🧾 Case Recall", "Quick check — what actually happened in the story?");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_RECALL_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:6, key:"witness", label:"Witness Statements", icon:"🗣️", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · WITNESS STATEMENTS", "🗣️ Who Should We Believe?", "Three students, three different accounts. Compare them carefully.");
+        stage.appendChild(el(`<div class="card">
+          <p><b>Noah:</b> "Tyler was standing near Priya's desk. I knew he was going to do something suspicious because he's always playing tricks on people. I'm sure he stole the phone."</p>
+          <p style="margin-top:8px;"><b>Tyler:</b> "I saw something on the floor beside Priya's desk, so I picked it up. I was going to hand it in, but I got distracted returning a basketball."</p>
+          <p style="margin-top:8px;"><b>Ethan:</b> "I was working on my science assignment. I remember seeing Priya's phone before lunch, but I don't know what happened to it afterward."</p>
+        </div>`));
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_WITNESS_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:7, key:"fou", label:"Fact, Opinion, or Unsupported?", icon:"🧩", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · THREE CATEGORIES", "🧩 Fact, Opinion, or Unsupported Claim?", "Some statements aren't quite fact or opinion — they're claims presented as true without enough evidence to back them up.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_FOU_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:8, key:"evboard", label:"The Evidence Board", icon:"🗂️", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · EVIDENCE BOARD", "🗂️ What Does the Evidence Actually Prove?", "For each piece of evidence, pick what it truly proves — not what it merely suggests to a suspicious mind.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_EVIDENCE_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:9, key:"explain", label:"The Interrogation", icon:"🧠", skill:"Writing", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · INTERROGATION", "🧠 Think It Through", "One short written answer this time.");
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE5_EXPLAIN_Q, ctx, "c5_explain");
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:10, key:"cee", label:"Claim, Evidence, Explanation", icon:"🔗", skill:"Writing", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · THE C-E-E METHOD", "🔗 Claim, Evidence, Explanation", "A strong argument has three parts: a <b>claim</b> (what you believe), <b>evidence</b> (a specific detail that supports it), and an <b>explanation</b> (why that evidence matters).");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE5_CEE_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:11, key:"report", label:"The Principal's Report", icon:"🖊️", skill:"Writing", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · OFFICIAL REPORT", "🖊️ The Principal's Report", "Write 7–9 sentences explaining what you think happened to Priya's phone. Include at least three pieces of evidence, explain why Noah's accusation may be unreliable, and note what's still uncertain.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem; color:var(--ink-soft);">Tap a sentence starter to drop it in, then build your sentence around it.</p></div>`));
+        const bank = el(`<div class="word-parts" style="margin-bottom:10px;"></div>`);
+        const ta = el(`<textarea placeholder="I believe that..." style="min-height:160px;"></textarea>`);
+        ta.value = ctx.getAnswer("c5_report")||"";
+        CASE5_WORD_BANK.forEach(phrase=>{
+          const chip = el(`<span style="cursor:pointer;">+ ${phrase}</span>`);
+          chip.addEventListener("click", ()=>{
+            ta.value = ta.value.trim().length ? ta.value.trim()+" "+phrase+" " : phrase+" ";
+            ta.dispatchEvent(new Event("input"));
+            ta.focus();
+          });
+          bank.appendChild(chip);
+        });
+        stage.appendChild(bank);
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("c5_report", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(11, words>=50?4:(words>=30?3:(words>=12?2:(words>0?1:0))));
+          ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(11, words>=50?4:(words>=30?3:(words>=12?2:1)));
+        }
+        footer(stage, s, ctx);
+      }},
+    {id:12, key:"handwriting", label:"Handwriting Check (paper)", icon:"✒️", skill:"Spelling", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · PAPER EVIDENCE", "✒️ The Detective's Notebook", "Grab a pencil!");
+        buildPaperTask(stage, s, `Copy this paragraph by hand:<br><br>
+          <i>"Noah believed Tyler had stolen the phone, but he had never actually seen him take it. The security footage showed Tyler picking up an object near the desk. Before making an accusation, the detectives needed to examine all the available evidence."</i><br><br>
+          1. Copy it carefully.<br>2. Underline every fact.<br>3. Circle the word that shows Noah's belief, not a fact.<br>4. Cover it up and rewrite the last sentence from memory.`,
+          "I finished the notebook copy on paper with my tutor", ctx, "handwritingDone");
+        footer(stage, s, ctx);
+      }},
+    {id:13, key:"journal", label:"Weekly Case Journal (paper)", icon:"📓", skill:"Writing", maxStars:1,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 005 · HOMEWORK", "📓 The Weekly Case Journal", "One short page a day:");
+        const days = [
+          ["Day 1 — Case Summary", "6–8 sentences summarizing the case: what went missing, who was questioned, what the witnesses said, what the footage showed, and how it was solved. Use at least three sequencing words."],
+          ["Day 2 — Fact vs. Opinion", "Find 5 statements from the story. For each: the statement, whether it's fact/opinion/unsupported, and why."],
+          ["Day 3 — Handwriting", "Copy: \"Noah believed Tyler had stolen the phone, but he had never actually seen him take it.\" Then rewrite it from memory and compare."],
+          ["Day 4 — Vocabulary", "Pick 5 words from the case (accusation, evidence, perspective, reliable, assumption, suspicious, verify, conclude). Word, meaning, synonym, and your own sentence for each."],
+          ["Day 5 — Persuasive Writing", "8–10 sentences: Should students be allowed to bring their phones to school? State your opinion, give two reasons, include one piece of evidence, consider an opposing viewpoint, and finish with a concluding sentence."]
+        ];
+        days.forEach(([t,d])=>stage.appendChild(el(`<div class="journal-day"><h4>${t}</h4><p>${d}</p></div>`)));
+        buildPaperTask(stage, s, `Print or copy this into the detective notebook to work through across the week.`, "Journal pages are printed / started", ctx, "journalStarted");
+        footer(stage, s, ctx);
+      }},
+    {id:14, key:"closed", label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0,
+      render:(stage, s, ctx)=>{
+        stage.innerHTML="";
+        const name = ctx.getAgent() || "Detective";
+        stage.appendChild(el(`<div class="closed-banner">
+          <div class="stamp-big">TO BE CONTINUED</div>
+          <h2>Sharp thinking, ${name}!</h2>
+          <p class="stage-sub" style="max-width:560px; margin:10px auto 0;">You weighed the evidence instead of trusting the loudest accusation. Keep your case journal going this week — the full truth about that second figure in the footage comes out next lesson.</p></div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
+          <div class="q-prompt">🏅 Achievement unlocked: Fair Witness</div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const revealBox = el(`<div style="max-width:560px; margin:0 auto 16px; text-align:center;"></div>`);
+        const revealBtn = el(`<button class="btn primary">🔓 Tutor only: reveal the solution (next lesson)</button>`);
+        revealBtn.addEventListener("click", ()=>{
+          revealBtn.remove();
+          revealBox.appendChild(el(`<div class="card story" style="text-align:left;">
+            <p><b>Solution:</b> Tyler was telling the truth — he found the phone on the floor and genuinely meant to hand it in. But the phone didn't get to the floor by accident.</p>
+            <p>The second, blurry figure at 12:15 was <b>Mason</b>, an older student from another class who sometimes hung around that hallway. Mason had slipped in during lunch, planning to borrow Priya's phone for a few minutes as a prank call to a friend — without asking. When he heard footsteps approaching, he panicked, fumbled the phone, and it slid off the desk and under the chair as he rushed back out the door, just moments before Tyler walked in.</p>
+            <p>When Mr. Lewis pulled the full hallway footage and showed it to Mason, he admitted what he'd done. "It was supposed to be a joke," he said. "I didn't think anyone would even notice I was in there." Mason apologized to Priya and had to explain himself to the office — taking something that isn't yours, even "just as a joke" and "just for a minute," is still wrong.</p>
+            <p>"So Noah wasn't completely wrong to be suspicious of someone," Mr. Lewis said. "He was just suspicious of the wrong person — because he jumped to a conclusion instead of checking the evidence all the way through."</p>
+          </div>`));
+        });
+        revealBox.appendChild(revealBtn);
+        stage.appendChild(revealBox);
+        const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
+        const rta = reflect.querySelector("textarea");
+        rta.value = ctx.getAnswer("reflection")||"";
+        rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
+        stage.appendChild(reflect);
+        if(!ctx.isComplete(14)){ ctx.markComplete(14); ctx.logCompletion(); }
+      }}
+  ]
+};
+
+
+const CASES = {"001": CASE1, "002": CASE2, "003": CASE3, "004": CASE4, "005": CASE5};
 
 /* ============================================================
    ENGINE
