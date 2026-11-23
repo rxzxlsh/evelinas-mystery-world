@@ -1779,7 +1779,322 @@ const CASE5 = {
 };
 
 
-const CASES = {"001": CASE1, "002": CASE2, "003": CASE3, "004": CASE4, "005": CASE5};
+/* ============================================================
+   CASE #007 — THE SECRET BEHIND THE PHOTOGRAPH
+   ============================================================ */
+const CASE7_PHYSICAL_Q = [
+  {q:'"Tall"', opts:["Physical description","Character trait"], correct:0, why:"Describes appearance, not personality."},
+  {q:'"Speaks quietly"', opts:["Physical description","Character trait"], correct:0, why:"It's a description of how someone sounds — quiet doesn't automatically mean shy or any particular personality."},
+  {q:'"Helps someone carry books"', opts:["Physical description","Character trait"], correct:1, why:"This action reveals a trait — helpfulness."},
+  {q:'"Keeps a promise despite difficulty"', opts:["Physical description","Character trait"], correct:1, why:"Sticking to a promise under pressure shows loyalty — a trait."},
+  {q:'"Blue eyes"', opts:["Physical description","Character trait"], correct:0, why:"An appearance detail only."},
+  {q:'"Lies to avoid getting into trouble"', opts:["Physical description","Character trait"], correct:1, why:"This reveals something about personality — dishonesty or fear, depending on context."}
+];
+const CASE7_TRAIT_Q = [
+  {q:"Maya notices a new student sitting alone, so she invites them to join her group. What trait does this show?", opts:["Welcoming","Stubborn","Secretive","Impatient"], correct:0},
+  {q:"Daniel practises his presentation every evening, even after making mistakes. What trait does this show?", opts:["Careless","Determined","Shy","Dishonest"], correct:1},
+  {q:"Olivia finds a wallet in the hallway and immediately takes it to the office. What trait does this show?", opts:["Nervous","Jealous","Honest","Lazy"], correct:2},
+  {q:"Ethan refuses to admit he made a mistake, even when his friends show him proof. What trait does this show?", opts:["Generous","Curious","Thoughtful","Stubborn"], correct:3},
+  {q:"Sophie stays behind after class to help her teacher organize the classroom. What trait does this show?", opts:["Rude","Anxious","Helpful","Secretive"], correct:2},
+  {q:"Liam hears a strange noise but decides to investigate rather than run away. What trait does this show?", opts:["Fearful","Brave","Careless","Shy"], correct:1},
+  {q:"A girl notices her friend is upset and quietly asks if everything is okay. What trait does this show?", opts:["Bossy","Indifferent","Nervous","Empathetic"], correct:3},
+  {q:"Noah promises to keep a secret and refuses to reveal it even under pressure. What trait does this show?", opts:["Impulsive","Careless","Loyal","Dishonest"], correct:2}
+];
+const CASE7_MOTIVE_Q = [
+  {q:"A boy hides his test paper when his friends walk past. What's the most likely motivation?", opts:["He's embarrassed about his mark","He's proud of his mark","He wants attention","He's bored"], correct:0},
+  {q:"A girl keeps visiting the library even though she's finished her assignment. What's the most likely motivation?", opts:["She's avoiding homework","She enjoys it or is looking for someone there","She's lost","She was told to"], correct:1},
+  {q:"A student refuses to throw away an old, torn notebook. What's the most likely motivation?", opts:["It has sentimental value to them","They forgot about it","It's required for class","They like torn things"], correct:0},
+  {q:"A character gives away their umbrella and walks home in the rain. What's the most likely motivation?", opts:["They forgot their umbrella was useful","They're compassionate about the other person","They don't mind getting wet, ever","They lost a bet"], correct:1},
+  {q:"Someone repeatedly checks the clock while waiting outside an office. What's the most likely motivation?", opts:["They're nervous or waiting for something important","They're bored of the clock","They want to be late","They're checking the time for no reason"], correct:0},
+  {q:"A girl becomes unusually quiet whenever someone mentions her older brother. What's the most likely motivation?", opts:["The topic may be emotionally difficult for her","She dislikes talking in general","She didn't hear them","She's being polite"], correct:0},
+  {q:"A student carefully folds a letter and places it inside a book. What's the most likely motivation?", opts:["The letter is probably important or private","They ran out of envelopes","It's just a habit","They want it to get lost"], correct:0},
+  {q:"A boy returns to a place where he was once embarrassed. What's the most likely motivation?", opts:["He may want to face his fear or resolve something unfinished","He forgot it happened there","He's required to go there","He wants to be embarrassed again"], correct:0}
+];
+const CASE7_SAYMEAN_Q = [
+  {q:'"I don\'t care who wins," Marcus said, gripping his team\'s score sheet tightly. What does he probably actually feel?', opts:["He cares more than he's letting on","He truly doesn't care at all","He's bored","He's confused"], correct:0, why:"Gripping the score sheet tightly contradicts his claim of not caring."},
+  {q:'"That\'s a lovely surprise," Emma replied, staring at the broken gift. What does she probably actually feel?', opts:["Genuinely delighted","Disappointed, but trying to be polite","Angry","Confused about what a gift is"], correct:1, why:"Her words are polite, but staring at the broken gift suggests disappointment."},
+  {q:'"I wasn\'t waiting for you," Daniel said, quickly putting his phone away. What does he probably actually feel?', opts:["He was waiting, but doesn't want to admit it","He truly wasn't waiting for anyone","He's annoyed at his phone","He's indifferent"], correct:0, why:"Quickly hiding the phone suggests he was caught doing exactly what he denies."},
+  {q:'"It\'s nothing," Sophie muttered, hiding a photograph inside her bag. What does this suggest about the photograph?', opts:["It's probably personal or emotionally important to her","It's genuinely unimportant","She forgot she had it","She wants someone to ask about it"], correct:0, why:"Hiding something while downplaying it usually means the opposite — it matters."},
+  {q:'"You really didn\'t have to do that," Lily said, smiling as she looked at the handmade card. What does she probably actually feel?', opts:["Genuinely touched and appreciative","Annoyed","Embarrassed for the giver","Confused"], correct:0, why:"Her smile matches her words here — this one isn't a contradiction, just genuine gratitude."},
+  {q:'"I suppose I could help," Noah sighed, already reaching for the books. What does this suggest?', opts:["He's reluctant in words, but willing in action","He refuses to help at all","He's excited to help","He's confused about what's needed"], correct:0, why:"His sigh suggests reluctance, but his actions (reaching for the books) show he's willing anyway."}
+];
+const CASE7_PHOTO_INTRO = [
+  "A photograph has turned up in the school's old archives. It shows four children standing outside Westbrook School, a building that was demolished years ago. Three faces are clear: Amelia, holding a book; Oliver, smiling at the camera; and James, holding a small wooden box. The fourth child — standing in the middle — has had their face carefully scratched out.",
+  "On the back, someone had written: <i>\"June 18, 2008. The day everything changed.\"</i>",
+  "The photograph was found inside an envelope labelled: <i>\"Do not show this to anyone.\"</i>",
+  "Nobody knows who scratched out the face, why they did it, or what happened on June 18, 2008. Your job isn't to guess wildly — it's to separate what the photograph actually shows from what you're only assuming."
+];
+const CASE7_SUSPECT_Q = [
+  {q:"What do we know for certain from the photograph itself?", opts:["One person's face has been deliberately scratched out","That person did something wrong","The person left because of an argument","The photo is a fake"], correct:0, why:"Everything else is a guess at this stage — only the scratching-out is an observed fact."},
+  {q:'"That person must have done something wrong." Is this a fact or an assumption, based on what we know so far?', opts:["An assumption","A fact"], correct:0, why:"There are other reasons someone's face might be removed — like protecting their privacy."},
+  {q:"Why might someone scratch out a person's face in an old photo? Pick the most reasonable possibility at this stage.", opts:["To protect that person's identity or privacy","Because the photo was haunted","Because cameras in 2008 did that automatically","No real reason — it's random"], correct:0},
+  {q:"The envelope says \"Do not show this to anyone.\" What's the safest conclusion to draw?", opts:["Someone wanted this photo kept private for some reason","The photo must contain something illegal","The person who wrote it was definitely guilty of a crime","It means nothing at all"], correct:0},
+  {q:"At this early stage, how confident should a good detective be about who the fourth child is?", opts:["Not confident yet — there isn't enough evidence","100% confident based on a guess","It doesn't matter who it is","Confident, because someone must be lying"], correct:0},
+  {q:"Which is the better detective habit here?", opts:["Rank suspects by available evidence, but stay open to being wrong","Pick the most suspicious-sounding person and stop looking","Assume the worst about everyone involved","Ignore the photograph and move on"], correct:0}
+];
+const CASE7_INTERVIEWS = [
+  "<b>Amelia</b> sat across from the detectives in a small office overlooking the school playground. When the detectives placed the photograph in front of her, her smile disappeared. \"Oh,\" she said quietly. \"I haven't seen that in years.\" She brushed her thumb over the scratched-out face. \"That was a strange day. We were all supposed to be together for the school's anniversary celebration.\" Asked who the fourth child was, she paused. \"I think you should ask James... because he kept the box.\" Then she folded her hands. \"Some memories are better left alone.\"",
+  "<b>Oliver's</b> photography studio was filled with framed pictures and camera equipment. He laughed when he saw the photograph. \"I remember that day! James brought that ridiculous wooden box everywhere.\" But his expression changed when asked who the fourth child was. \"Of course I do,\" he said, leaning back. \"But I don't think I'm the person who should tell you. I promised someone I wouldn't.\" He glanced at the photo again. \"James knows more than he's saying.\"",
+  "<b>James</b> worked in the historical archive where the photograph had originally been found, among tall shelves and the smell of old paper. When the detectives showed him the picture, he immediately stopped moving. \"Where did you find that? I thought that had been destroyed.\" Asked who the fourth child was, he looked toward the narrow windows. \"That doesn't matter anymore... please, there are things you don't understand.\" Then he noticed the wooden box in the photo, and his expression softened. \"Do you still have the box?\" he whispered."
+];
+const CASE7_WITNESS_Q = [
+  {q:'Amelia says, "Some memories are better left alone." What does this most likely reveal about how she feels?', opts:["Uncomfortable or sad about the memory","Completely indifferent","Excited to talk about it","Confused about the question"], correct:0},
+  {q:'Oliver says, "I promised someone I wouldn\'t [tell]." What does this most likely reveal?', opts:["He feels protective of someone and conflicted about staying quiet","He never knew who the fourth child was","He's annoyed at being asked","He's lying about everything"], correct:0},
+  {q:'James says, "I thought that had been destroyed." What does this most likely reveal?', opts:["He's worried or surprised the photo still exists","He destroyed it himself out of spite","He's relieved it was found","He has no connection to the photo"], correct:0},
+  {q:"Amelia says James kept the box. Oliver remembers James bringing the box everywhere. What does this agreement between two witnesses suggest?", opts:["It supports the idea that James was closely connected to the box","It proves the two witnesses are lying together","It's just a coincidence that means nothing","It proves James stole something"], correct:0},
+  {q:"Which character seems the most reluctant to share information?", opts:["James","Amelia","Oliver","They're all equally open"], correct:0},
+  {q:"Does refusing to answer a question automatically mean someone is guilty of wrongdoing?", opts:["No — they might be protecting someone or keeping a promise","Yes, always","Only if they're smiling","Only if a teacher is present"], correct:0},
+  {q:"James reacts strongly to the wooden box, not just to being asked questions directly. What does this suggest?", opts:["His reaction to the object may reveal more than his actual words do","The box is worthless and irrelevant","He wants to sell the box","Nothing — objects can't reveal feelings"], correct:0},
+  {q:"Based on all three interviews, who appears to know the most about the fourth child's identity?", opts:["James, though Oliver also clearly knows","Amelia only","Oliver only","Nobody knows anything"], correct:0}
+];
+const CASE7_HIDDEN_OBJECT = [
+  "In the archive's storage room, behind several cardboard boxes, the detectives found a small wooden chest — scratched, with a faded blue ribbon tied around its handle. A brass label read: <b>WESTBROOK — CLASS OF 2008</b>.",
+  "Inside were four folded letters, a friendship bracelet, a small drawing of the school, and a sealed envelope addressed: <i>\"To the three people who promised to remember me.\"</i>",
+  "The detectives opened it. <i>\"Dear Amelia, Oliver, and James, I know things have been difficult since I left. I don't want anyone to feel sorry for me, and I don't want my story to become something people whisper about. I am not angry that you stayed. I am grateful that you were my friends. Please keep the box safe. One day, I hope we can look at these memories without feeling sad. Your friend, Nora.\"</i>",
+  "The fourth child had a name. Nora."
+];
+const CASE7_NORA_Q = [
+  {q:"Who is the fourth child in the photograph, based on the letter?", opts:["Nora","Amelia","A stranger","Nobody — it's unsolved"], correct:0},
+  {q:"Does the letter tell us exactly why Nora left Westbrook?", opts:["No — it hints at difficulty, but doesn't give full details","Yes, in complete detail","She never actually left","It says she was expelled"], correct:0, why:"Good detectives don't invent details the evidence doesn't give."},
+  {q:"Why might Nora not want people whispering about her?", opts:["She likely wanted privacy and didn't want to be treated differently","She hates her old friends","She was never actually at the school","She wanted more attention"], correct:0},
+  {q:"What does the letter reveal about Nora's personality?", opts:["Thoughtful and considerate — she worries about her friends' feelings, not just her own","Careless and indifferent","Dishonest and secretive for no reason","Angry and vengeful"], correct:0},
+  {q:"Why did the three friends promise to remember her?", opts:["They shared a meaningful friendship worth preserving","They were forced to by a teacher","It was part of a school assignment","They didn't actually promise anything"], correct:0},
+  {q:"\"Nora hated her friends and wanted to disappear forever.\" Is this supported by the letter?", opts:["No — the letter says the opposite: she's grateful for them","Yes, completely","Partially, about half of it","The letter doesn't mention friends at all"], correct:0}
+];
+const CASE7_MOTIVE_BOARD_Q = [
+  {q:"Amelia avoided identifying Nora directly to the detectives. What's the most likely motivation?", opts:["Respecting Nora's wish for privacy","She forgot who it was","She wanted to protect herself from blame","She enjoys keeping secrets for no reason"], correct:0},
+  {q:"Oliver refused to reveal Nora's identity. What's the most likely motivation?", opts:["Keeping a promise he made to Nora","He genuinely didn't know","He wanted to seem mysterious","He was told to lie by a teacher"], correct:0},
+  {q:"James tried to protect the photograph and the box for years. What's the most likely motivation?", opts:["Preserving something important to their friendship","He wanted to sell them later","He forgot they existed","He was ordered to by the school"], correct:0},
+  {q:"Nora asked her friends to keep the box safe. What's the most likely motivation?", opts:["She wanted to protect their shared memories without becoming the subject of gossip","She didn't want the box at all","She wanted to get her friends in trouble","She had no particular reason"], correct:0}
+];
+const CASE7_CLASSIFY_Q = [
+  {q:"\"Nora was the fourth child in the photograph.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:0, why:"Directly confirmed by the letter."},
+  {q:"\"James scratched out Nora's face.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:0, why:"Confirmed by James's own note."},
+  {q:"\"Nora wanted her identity kept private.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:0, why:"Stated directly in Nora's letter and James's note."},
+  {q:"\"Nora hated her friends.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:2, why:"Nothing supports this — in fact the letter says the opposite."},
+  {q:"\"Oliver knew who the fourth child was.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:0, why:"He directly said so in his interview."},
+  {q:"\"James missed Nora.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:0, why:"Confirmed by James's own note, where he admits this."},
+  {q:"\"Nora moved away because she was angry with Amelia.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:2, why:"Nothing in the evidence supports this specific claim."},
+  {q:"\"The three friends cared about Nora.\" How should we classify this?", opts:["Confirmed","Reasonable inference","Unsupported assumption"], correct:1, why:"Strongly supported by their actions and the letter, though never stated in those exact words."}
+];
+const CASE7_THEORY_Q = [
+  {q:"Why was Nora's face scratched out of the photograph, and what does this reveal about James? Include a claim, two pieces of evidence, and an explanation connecting them.",
+    sample:"I believe James scratched out Nora's face because he wanted to respect her wish for privacy. In his note, he explains that Nora didn't want her photograph displayed or her name discussed because she felt embarrassed about her family's problems. James also kept the wooden box safe for many years, which shows he wanted to protect their shared memories. This suggests James is loyal and thoughtful, even though he struggled with missing his friend."}
+];
+const CASE7_SHOWTELL_Q = [
+  {q:"A) James was nervous.<br>B) James rubbed his palms against his trousers and kept glancing toward the archive door.", opts:["Option A","Option B"], correct:1},
+  {q:"A) Amelia was kind.<br>B) Amelia noticed the new student standing alone and quietly pulled out a chair beside her.", opts:["Option A","Option B"], correct:1},
+  {q:"A) Oliver was hiding something.<br>B) Oliver quickly folded the letter and slipped it into his jacket when the detectives entered.", opts:["Option A","Option B"], correct:1},
+  {q:"A) Nora was lonely.<br>B) Nora sat beside the window, watching groups of friends laugh together in the playground.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The boy was embarrassed.<br>B) The boy lowered his head, pulled his hood over his face, and avoided everyone's eyes.", opts:["Option A","Option B"], correct:1},
+  {q:"A) The teacher was disappointed.<br>B) The teacher placed the unfinished assignment on the desk and sighed before speaking.", opts:["Option A","Option B"], correct:1, why:"Showing uses actions and small details so the reader infers the feeling, instead of just naming it."}
+];
+const CASE7_WORD_BANK = ["My character","was the kind of person who","Although most people thought","there was something they didn't know","Every time someone mentioned","the character would","One afternoon","discovered","whispered","What nobody knew was"];
+
+const CASE7 = {
+  id:"007", tabLabel:"Case #007", tabSub:"The Photograph",
+  title:'Case #007: The <span>Secret Behind the Photograph</span>', stamp:"OPEN CASE",
+  stations:[
+    {id:0, key:"briefing", label:"The Briefing", icon:"🖼️", skill:"Focus", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · BRIEFING", "🖼️ The Briefing", "What a character says, does, and feels aren't always the same thing.");
+        stage.appendChild(el(`<div class="card">
+          <p>A photograph has turned up in the school's archives. Three faces are clear — one has been carefully scratched out. Nobody knows who, or why.</p>
+          <p style="margin-top:8px;">This case isn't about finding a culprit. It's about reading <i>people</i>: their actions, their words, and the gap that sometimes opens up between the two.</p>
+        </div>`));
+        ctx.awardStars(0,2);
+        footer(stage, s, ctx);
+      }},
+    {id:1, key:"trait_vs_physical", label:"Trait or Appearance?", icon:"🔍", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · DETECTIVE TRAINING", "🔍 Trait or Appearance?", "A character trait describes personality — what someone is like on the inside. It's different from a physical description.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_PHYSICAL_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:2, key:"trait_practice", label:"Spot the Trait", icon:"🧭", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · DETECTIVE TRAINING", "🧭 Spot the Trait", "One action doesn't always prove a trait — but it's still good evidence. What does each action suggest?");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_TRAIT_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:3, key:"motivation", label:"Why Did They Do That?", icon:"❓", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · DETECTIVE TRAINING", "❓ Why Did They Do That?", "Motivation is the reason behind an action. Sometimes it's stated — usually, you have to infer it from action + clue.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_MOTIVE_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:4, key:"say_vs_mean", label:"What They Say vs. Mean", icon:"🗯️", skill:"Reading", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · DETECTIVE TRAINING", "🗯️ What They Say vs. What They Mean", "Characters don't always say exactly what they're thinking. Body language and context can reveal more than words.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_SAYMEAN_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:5, key:"photo", label:"The Photograph", icon:"📷", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · THE CASE", "📷 The Photograph Arrives", "Read carefully — a photograph only tells part of the story.");
+        stage.appendChild(el(`<div class="card story">${CASE7_PHOTO_INTRO.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        ctx.awardStars(5,2);
+        footer(stage, s, ctx);
+      }},
+    {id:6, key:"suspect_board", label:"The Suspect Board", icon:"🗂️", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · SUSPECT BOARD", "🗂️ Facts vs. Assumptions", "Suspicion is not proof. Separate what the photo shows from what you're only guessing.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_SUSPECT_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:7, key:"interviews", label:"The Interviews", icon:"🎙️", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · WITNESSES", "🎙️ Interview the Witnesses", "Three people from the photograph remember June 18 differently. Read closely — notice what they say, and what they carefully avoid saying.");
+        stage.appendChild(el(`<div class="card story">${CASE7_INTERVIEWS.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        ctx.awardStars(7,2);
+        footer(stage, s, ctx);
+      }},
+    {id:8, key:"witness_analysis", label:"Reading Between the Lines", icon:"🔎", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · WITNESS ANALYSIS", "🔎 Reading Between the Lines", "What each witness says — and what it probably reveals.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_WITNESS_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:9, key:"hidden_object", label:"The Hidden Object", icon:"📦", skill:"Reading", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · THE DISCOVERY", "📦 The Hidden Object", "The wooden box, finally opened.");
+        stage.appendChild(el(`<div class="card story">${CASE7_HIDDEN_OBJECT.map(p=>`<p>${p}</p>`).join("")}</div>`));
+        ctx.awardStars(9,2);
+        footer(stage, s, ctx);
+      }},
+    {id:10, key:"infer_nora", label:"What Can We Infer?", icon:"💭", skill:"Evidence", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · INFERENCE CHECK", "💭 What Can We Infer About Nora?", "Stick to what the letter actually supports — don't invent details it doesn't give.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_NORA_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:11, key:"motive_board", label:"The Motivation Board", icon:"🧩", skill:"Evidence", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · MOTIVATION BOARD", "🧩 Match the Motivation", "For each action, pick the most likely reason behind it.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_MOTIVE_BOARD_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:12, key:"classify", label:"Evidence Analysis", icon:"📋", skill:"Evidence", maxStars:4,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · EVIDENCE ANALYSIS", "📋 Confirmed, Inference, or Unsupported?", "Sort each statement by how strongly the evidence actually backs it up.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_CLASSIFY_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:13, key:"theory", label:"Final Theory", icon:"🖊️", skill:"Writing", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · FINAL THEORY", "🖊️ Why Was Nora's Face Scratched Out?", "Write your theory. Include a claim, two pieces of evidence, and an explanation connecting them.");
+        const wrap = el(`<div></div>`);
+        buildFreeResponse(wrap, s, CASE7_THEORY_Q, ctx, "c7_theory");
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:14, key:"show_tell", label:"Show, Don't Tell", icon:"✨", skill:"Vocabulary", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · WRITING WORKSHOP", "✨ Show, Don't Tell", "Authors reveal personality through actions, dialogue, thoughts, and reactions — instead of just naming the feeling. Pick the stronger version.");
+        const wrap = el(`<div></div>`);
+        buildMCQuiz(wrap, s, CASE7_SHOWTELL_Q, ctx);
+        stage.appendChild(wrap);
+        footer(stage, s, ctx);
+      }},
+    {id:15, key:"character_creation", label:"Create Your Own Mystery Character", icon:"🎭", skill:"Writing", maxStars:3,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · YOUR TURN", "🎭 Create Your Own Mystery Character", "Invent a character who's hiding something. 9–12 sentences: at least three traits, two shown through actions, one line of dialogue, a mysterious object, and an ending that creates curiosity.");
+        stage.appendChild(el(`<div class="card"><p style="font-size:0.85rem; color:var(--ink-soft);">Stuck? Tap a phrase below to drop it in — but try writing on your own first.</p></div>`));
+        const bank = el(`<div class="word-parts" style="margin-bottom:10px;"></div>`);
+        const ta = el(`<textarea placeholder="My character, ___, was the kind of person who..." style="min-height:160px;"></textarea>`);
+        ta.value = ctx.getAnswer("c7_character")||"";
+        CASE7_WORD_BANK.forEach(phrase=>{
+          const chip = el(`<span style="cursor:pointer;">+ ${phrase}</span>`);
+          chip.addEventListener("click", ()=>{
+            ta.value = ta.value.trim().length ? ta.value.trim()+" "+phrase+" " : phrase+" ";
+            ta.dispatchEvent(new Event("input"));
+            ta.focus();
+          });
+          bank.appendChild(chip);
+        });
+        stage.appendChild(bank);
+        ta.addEventListener("input", ()=>{
+          ctx.setAnswer("c7_character", ta.value);
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(15, words>=60?3:(words>=30?2:(words>0?1:0)));
+          ctx.refresh();
+        });
+        stage.appendChild(ta);
+        if(ta.value){
+          const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+          ctx.awardStars(15, words>=60?3:(words>=30?2:1));
+        }
+        footer(stage, s, ctx);
+      }},
+    {id:16, key:"handwriting", label:"Handwriting Check (paper)", icon:"✒️", skill:"Spelling", maxStars:2,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · PAPER EVIDENCE", "✒️ The Archive Journal", "Grab a pencil!");
+        buildPaperTask(stage, s, `Copy this paragraph by hand:<br><br>
+          <i>"Some memories are difficult to share, but that does not mean they should be forgotten. A photograph can hold more than an image. It can hold promises, friendships, and moments that changed someone's life. Sometimes, the smallest details reveal the biggest secrets."</i><br><br>
+          1. Copy it carefully.<br>2. Cover the original and rewrite it from memory.<br>3. Circle any spelling mistakes.<br>4. Choose three words and write their meanings.<br>5. Rewrite the final sentence in your own words.`,
+          "I finished the archive journal copy on paper with my tutor", ctx, "handwritingDone");
+        footer(stage, s, ctx);
+      }},
+    {id:17, key:"journal", label:"Weekly Case Journal (paper)", icon:"📓", skill:"Writing", maxStars:1,
+      render:(stage, s, ctx)=>{
+        stageHeader(stage, "FILE 007 · HOMEWORK", "📓 The Weekly Case Journal", "One short page a day:");
+        const days = [
+          ["Monday — Character profile", "Choose a character from a book or movie. Describe five personality traits and give one example of an action or line of dialogue that supports each."],
+          ["Tuesday — Motivation investigator", "Choose three actions a character performs in a story. Explain why they might have done each one, using evidence."],
+          ["Wednesday — Show, don't tell", "Write five sentences describing emotions without directly naming them (show someone is nervous without using the word \"nervous\")."],
+          ["Thursday — The hidden secret", "Write an 8–10 sentence mystery scene where a character is hiding something. Give readers at least three clues about their motivation."],
+          ["Friday — Character transformation", "Write a 10–12 sentence story about a character who changes their mind about something important — and why their thinking changed."]
+        ];
+        days.forEach(([t,d])=>stage.appendChild(el(`<div class="journal-day"><h4>${t}</h4><p>${d}</p></div>`)));
+        buildPaperTask(stage, s, `Print or copy this into the detective notebook to work through across the week. Daily handwriting: copy two sentences from the day's homework neatly.`, "Journal pages are printed / started", ctx, "journalStarted");
+        footer(stage, s, ctx);
+      }},
+    {id:18, key:"closed", label:"Case Closed", icon:"🔐", skill:"Focus", maxStars:0,
+      render:(stage, s, ctx)=>{
+        stage.innerHTML="";
+        const name = ctx.getAgent() || "Detective";
+        stage.appendChild(el(`<div class="closed-banner">
+          <div class="stamp-big">CASE SOLVED</div>
+          <h2>Beautifully read, ${name}!</h2>
+          <p class="stage-sub" style="max-width:560px; margin:10px auto 0;">The fourth child was Nora. James scratched out her face because she'd asked her friends to keep her identity private — her family had gone through difficult times, and she didn't want her personal life becoming gossip around the school.</p></div>`));
+        stage.appendChild(el(`<div class="card story" style="max-width:560px; margin:0 auto 16px;">
+          <p>Amelia respected her privacy. Oliver kept his promise. James preserved the box and the photograph — but he was also quietly avoiding memories that made him sad about losing his friend.</p>
+          <p>The photograph was never evidence of a crime. It was evidence of a friendship.</p>
+          <p><b>The lesson:</b> a person's actions don't always reveal their full motivation. Sometimes people hide things because they're protecting someone, keeping a promise, or struggling with feelings they haven't sorted out yet.</p>
+        </div>`));
+        stage.appendChild(el(`<div class="card" style="max-width:520px; margin:0 auto 16px;">
+          <div class="q-prompt">🏅 Achievement unlocked: Reader of People</div>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">Total score: ${ctx.totalStars()} / ${ctx.maxTotalStars()} stars</p></div>`));
+        const reflect = el(`<div class="card" style="max-width:520px; margin:0 auto;"><div class="q-prompt">What was the hardest part today?</div><textarea placeholder="Type your reflection..."></textarea></div>`);
+        const rta = reflect.querySelector("textarea");
+        rta.value = ctx.getAnswer("reflection")||"";
+        rta.addEventListener("input", ()=>ctx.setAnswer("reflection", rta.value));
+        stage.appendChild(reflect);
+        if(!ctx.isComplete(18)){ ctx.markComplete(18); ctx.logCompletion(); }
+      }}
+  ]
+};
+
+
+const CASES = {"001": CASE1, "002": CASE2, "003": CASE3, "004": CASE4, "005": CASE5, "007": CASE7};
 
 /* ============================================================
    ENGINE
